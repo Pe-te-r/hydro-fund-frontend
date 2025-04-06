@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ReactNode, useState } from 'react';
 import NavBar from './components/NavBar';
 import { SelectUser } from './types/type';
+import Register from './pages/users/Register';
 
 // Define props for our route components
 interface RouteComponentProps {
@@ -19,37 +20,18 @@ const Contact = ({ children }: RouteComponentProps) => <div className="min-h-scr
 const Profile = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">User Profile{children}</div>;
 const Settings = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">Account Settings{children}</div>;
 const Login = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">Login Form{children}</div>;
-const Register = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">Registration Form{children}</div>;
 const Home = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">Welcome to HydroFund{children}</div>;
 const NotFound = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 p-4">404 - Page Not Found{children}</div>;
 
 function App() {
-  const [user, setUser] = useState<SelectUser | null>(null); // Start with no user to test auth flow
+  const [user,] = useState<SelectUser | null>(null); // Start with no user to test auth flow
 
-  // Toggle auth state for demo purposes
-  const toggleAuth = () => {
-    setUser(user ? null : {
-      id: 'user-123',
-      username: 'investor2023',
-      email: 'user@example.com',
-      phone: '+254712345678',
-      balance: '15000.00',
-      vipTier: 'gold',
-    });
-  };
+  
 
   return (
     <Router>
       <div className="App">
         <NavBar />
-
-        {/* Demo auth toggle button - remove in production */}
-        <button
-          onClick={toggleAuth}
-          className="fixed bottom-4 right-4 bg-blue-600 text-white px-4 py-2 rounded-md z-50"
-        >
-          {user ? 'Logout' : 'Login (Demo)'}
-        </button>
 
         <Routes>
           {/* Public routes */}
