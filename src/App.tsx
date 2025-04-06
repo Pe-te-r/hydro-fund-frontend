@@ -4,6 +4,7 @@ import { ReactNode, useState } from 'react';
 import NavBar from './components/NavBar';
 import { SelectUser } from './types/type';
 import Register from './pages/users/Register';
+import Login from './pages/users/Login';
 
 // Define props for our route components
 interface RouteComponentProps {
@@ -19,7 +20,6 @@ const About = ({ children }: RouteComponentProps) => <div className="min-h-scree
 const Contact = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">Contact Us{children}</div>;
 const Profile = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">User Profile{children}</div>;
 const Settings = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">Account Settings{children}</div>;
-const Login = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">Login Form{children}</div>;
 const Home = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">Welcome to HydroFund{children}</div>;
 const NotFound = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 p-4">404 - Page Not Found{children}</div>;
 

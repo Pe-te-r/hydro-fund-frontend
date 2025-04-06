@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FiUser, FiMail, FiPhone, FiLock, FiGift, FiArrowRight } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
+import { useRegisterMutation } from '../../slice/auth';
 
 const Register = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -11,9 +13,9 @@ const Register = () => {
     const [formData, setFormData] = useState({
         username: '',
         email: '',
-        phoneNumber: '',
+        phone: '',
         password: '',
-        referralCode: searchParams.get('ref') || ''
+        inviteCode: searchParams.get('ref') || ''
     });
 
     // Validation errors
@@ -22,14 +24,14 @@ const Register = () => {
 
     // Handle referral code changes
     useEffect(() => {
-        if (formData.referralCode) {
-            searchParams.set('ref', formData.referralCode);
+        if (formData.inviteCode) {
+            searchParams.set('ref', formData.inviteCode);
             setSearchParams(searchParams);
         } else {
             searchParams.delete('ref');
             setSearchParams(searchParams);
         }
-    }, [formData.referralCode, searchParams, setSearchParams]);
+    }, [formData.inviteCode, searchParams, setSearchParams]);
 
     // Handle input changes
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -64,9 +66,9 @@ const Register = () => {
             newErrors.email = 'Please enter a valid email';
         }
 
-        if (!formData.phoneNumber.trim()) {
-            newErrors.phoneNumber = 'Phone number is required';
-        } else if (!/^[\d\s\+\-\(\)]{10,15}$/.test(formData.phoneNumber)) {
+        if (!formData.phone.trim()) {
+            newErrors.phone = 'Phone number is required';
+        } else if (!/^[\d\s\+\-\(\)]{10,15}$/.test(formData.phone)) {
             newErrors.phoneNumber = 'Please enter a valid phone number';
         }
 
@@ -76,7 +78,7 @@ const Register = () => {
             newErrors.password = 'Password must be at least 8 characters';
         }
 
-        if (formData.referralCode && !/^\d{8}$/.test(formData.referralCode)) {
+        if (formData.inviteCode && !/^\d{8}$/.test(formData.inviteCode)) {
             newErrors.referralCode = 'Referral code must be 8 digits';
         }
 
@@ -84,26 +86,50 @@ const Register = () => {
         return Object.keys(newErrors).length === 0;
     };
 
+
+    const [register] = useRegisterMutation();
+
     // Handle form submission
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (validateForm()) {
-            setIsSubmitting(true);
+            try {
+                setIsSubmitting(true);
 
-            // Simulate API call
-            setTimeout(() => {
-                console.log('Registration Data:', {
-                    ...formData,
-                    phoneNumber: formData.phoneNumber.replace(/\D/g, '') // Clean phone number
-                });
+                console.log(formData)
 
+                // Call the register mutation
+                const response = await register({
+                    username: formData.username,
+                    email: formData.email,
+                    phone: formData.phone.replace(/\D/g, ''),
+                    password: formData.password,
+                    inviteCode: formData.inviteCode
+                }).unwrap();
+
+                console.log('Registration Response:', response);
+
+                // Access the response data
+                if (response.status === 'success') {
+                    console.log('User data:', response.data.user);
+                    console.log('Token:', response.data.token);
+
+                    // Store token in localStorage or context
+                    localStorage.setItem('token', response.data.token);
+
+                    // Redirect user
+                    navigate('/');
+                }
+
+            } catch (err) {
+                console.error('Registration Error:', err);
+                // Handle error (you can access error.data.message if your API returns it)
+            } finally {
                 setIsSubmitting(false);
-                navigate('/welcome'); // Redirect after successful registration
-            }, 1500);
+            }
         }
     };
-
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
@@ -161,7 +187,7 @@ const Register = () => {
 
                         {/* Phone Number Field */}
                         <div className="space-y-1">
-                            <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
+                            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
                                 Phone Number
                             </label>
                             <div className="relative">
@@ -170,15 +196,15 @@ const Register = () => {
                                 </div>
                                 <input
                                     type="tel"
-                                    id="phoneNumber"
-                                    name="phoneNumber"
-                                    value={formData.phoneNumber}
+                                    id="phone"
+                                    name="phone"
+                                    value={formData.phone}
                                     onChange={handleChange}
-                                    className={`block w-full pl-10 pr-3 py-2 border ${errors.phoneNumber ? 'border-red-300' : 'border-gray-300'} rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
-                                    placeholder="+1 (123) 456-7890"
+                                    className={`block w-full pl-10 pr-3 py-2 border ${errors.phone ? 'border-red-300' : 'border-gray-300'} rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                                    placeholder="+254 (76) 456-7890"
                                 />
                             </div>
-                            {errors.phoneNumber && <p className="text-red-500 text-xs mt-1">{errors.phoneNumber}</p>}
+                            {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
                         </div>
 
                         {/* Password Field */}
@@ -218,18 +244,18 @@ const Register = () => {
                                 <input
                                     type="text"
                                     id="referralCode"
-                                    name="referralCode"
-                                    value={formData.referralCode}
+                                    name="inviteCode"
+                                    value={formData.inviteCode}
                                     onChange={handleChange}
-                                    className={`block w-full pl-10 pr-3 py-2 border ${errors.referralCode ? 'border-red-300' : 'border-gray-300'} rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
+                                    className={`block w-full pl-10 pr-3 py-2 border ${errors.inviteCode ? 'border-red-300' : 'border-gray-300'} rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500`}
                                     placeholder="8-digit code"
                                     maxLength={8}
                                 />
                             </div>
-                            {errors.referralCode && <p className="text-red-500 text-xs mt-1">{errors.referralCode}</p>}
-                            {formData.referralCode && (
+                            {errors.referralCode && <p className="text-red-500 text-xs mt-1">{errors.inviteCode}</p>}
+                            {formData.inviteCode && (
                                 <p className="text-green-600 text-xs mt-1">
-                                    Current referral URL: {window.location.origin}?ref={formData.referralCode}
+                                    Current referral URL: {window.location.origin}?ref={formData.inviteCode}
                                 </p>
                             )}
                         </div>
@@ -271,9 +297,9 @@ const Register = () => {
                     <div className="px-6 pb-6 text-center">
                         <p className="text-sm text-gray-600">
                             Already have an account?{' '}
-                            <a href="/login" className="font-medium text-blue-600 hover:text-blue-800">
+                            <Link to="/login" className="font-medium text-blue-600 hover:text-blue-800">
                                 Sign in
-                            </a>
+                            </Link>
                         </p>
                     </div>
                 </div>
