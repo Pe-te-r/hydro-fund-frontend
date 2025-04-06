@@ -18,7 +18,7 @@ import {
 } from 'react-icons/fi';
 
 const NavBar = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(true);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
 
@@ -45,7 +45,7 @@ const NavBar = () => {
 
     return (
         <nav className="bg-gradient-to-r from-blue-600 to-blue-800 shadow-lg sticky top-0 z-50">
-            <div className="mx-auto w-full md:w-4/5 px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto w-full lg:w-4/5 px-4 sm:px-6 lg:px-8">
                 <div className="flex h-16 items-center justify-between">
                     {/* Left side - Logo/Brand */}
                     <div className="flex items-center">
@@ -110,8 +110,8 @@ const NavBar = () => {
                                                 <p className="text-sm font-medium text-gray-900 truncate">Welcome back!</p>
                                             </div>
                                             <div className="py-1">
-                                                <DropdownLink to="/account" icon={<FiUser />} text="Account" />
                                                 <DropdownLink to="/dashboard" icon={<FiPieChart />} text="Dashboard" />
+                                                <DropdownLink to="/account" icon={<FiUser />} text="Account" />
                                                 <DropdownLink to="/settings" icon={<FiSettings />} text="Settings" />
                                             </div>
                                             <div className="py-1">
