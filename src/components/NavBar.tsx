@@ -16,9 +16,11 @@ import {
     FiX
     
 } from 'react-icons/fi';
+import { useAuth } from '../context/AuthContext';
 
 const NavBar = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const { isLoggedIn, logout } = useAuth();
+    // const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
 
@@ -38,10 +40,10 @@ const NavBar = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [isAccountDropdownOpen]);
 
-    const toggleLogin = () => {
-        setIsLoggedIn(!isLoggedIn);
-        setIsAccountDropdownOpen(false);
-    };
+    // const toggleLogin = () => {
+    //     setIsLoggedIn(!isLoggedIn);
+    //     setIsAccountDropdownOpen(false);
+    // };
 
     return (
         <nav className="bg-gradient-to-r from-blue-600 to-blue-800 shadow-lg sticky top-0 z-50">
@@ -116,7 +118,7 @@ const NavBar = () => {
                                             </div>
                                             <div className="py-1">
                                                 <button
-                                                    onClick={toggleLogin}
+                                                    onClick={logout}
                                                     className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                                                 >
                                                     <FiLogOut className="mr-2" />
@@ -196,7 +198,7 @@ const NavBar = () => {
                                 <MobileDropdownLink to="/dashboard" icon={<FiPieChart />} text="Dashboard" />
                                 <MobileDropdownLink to="/settings" icon={<FiSettings />} text="Settings" />
                                 <button
-                                    onClick={toggleLogin}
+                                    onClick={logout}
                                     className="w-full flex items-center px-3 py-2 rounded-md text-base font-medium text-white hover:bg-blue-600"
                                 >
                                     <FiLogOut className="mr-2" />

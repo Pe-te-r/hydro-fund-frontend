@@ -98,7 +98,6 @@ const Register = () => {
             try {
                 setIsSubmitting(true);
 
-                console.log(formData)
 
                 // Call the register mutation
                 const response = await register({
@@ -108,22 +107,15 @@ const Register = () => {
                     password: formData.password,
                     inviteCode: formData.inviteCode
                 }).unwrap();
-
-                console.log('Registration Response:', response);
-
                 
 
                 // Access the response data
                 if (response.status === 'success') {
-                    console.log('User data:', response.data.user);
-                    console.log('Token:', response.data.token);
+
                     toast.success(response.message)
 
-                    // Store token in localStorage or context
-                    localStorage.setItem('token', response.data.token);
-
                     // Redirect user
-                    navigate('/');
+                    navigate('/login');
                 }
 
             } catch (err) {

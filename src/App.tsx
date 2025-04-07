@@ -5,6 +5,7 @@ import NavBar from './components/NavBar';
 import { SelectUser } from './types/type';
 import Register from './pages/users/Register';
 import Login from './pages/users/Login';
+import { useAuth } from './context/AuthContext';
 
 // Define props for our route components
 interface RouteComponentProps {
@@ -24,8 +25,7 @@ const Home = ({ children }: RouteComponentProps) => <div className="min-h-screen
 const NotFound = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 p-4">404 - Page Not Found{children}</div>;
 
 function App() {
-  const [user,] = useState<SelectUser | null>(null); // Start with no user to test auth flow
-
+  const {user} = useAuth()
   
 
   return (

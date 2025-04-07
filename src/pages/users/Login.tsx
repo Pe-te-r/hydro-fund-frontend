@@ -11,6 +11,7 @@ import {   Link, useNavigate } from 'react-router-dom';
 import { useLoginMutation } from '../../slice/auth';
 import { toast } from 'react-toastify';
 import { ErrorResponse } from '../../types/type';
+import { useAuth } from '../../context/AuthContext';
 
 type LoginMethod = 'username' | 'email' | 'phone';
 
@@ -75,9 +76,9 @@ const Login = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const [login,] = useLoginMutation();
+    const [sendLogin,] = useLoginMutation();
     const navigate=useNavigate()
-
+    const {login} = useAuth()
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -103,17 +104,14 @@ const Login = () => {
                     credentials.phone = formData.phone;
                     break;
             }
-            console.log(credentials)
             // Call the login mutation
-            const response = await login(credentials).unwrap();
+            const response = await sendLogin(credentials).unwrap();
 
             console.log('Login successful:', response);
+            login({token:response.data.token,email:response.data.user.email,username:response.data.user.username})
             toast.success(response.message)
-            
-            // Handle successful login (store token, redirect, etc.)
-            localStorage.setItem('token', response.data.token);
-            
-            navigate('/');
+                        
+            navigate('/dashboard');
         } catch (err) {
             const apiError = err as { status: number; data: ErrorResponse };
             console.log(apiError)
