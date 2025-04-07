@@ -6,6 +6,11 @@ import Register from './pages/users/Register';
 import Login from './pages/users/Login';
 import { useAuth } from './context/AuthContext';
 import AccountPage from './pages/users/Account';
+import SettingsPage from './pages/users/Settings';
+import AccountDashboard from './pages/users/Dashboard';
+import HomePage from './pages/Home';
+import AboutPage from './pages/About';
+import InvestmentProducts from './pages/Invest';
 
 // Define props for our route components
 interface RouteComponentProps {
@@ -13,15 +18,11 @@ interface RouteComponentProps {
 }
 
 // Create components with proper typing
-const Dashboard = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">Dashboard Content{children}</div>;
-const Invest = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">Investment Portal{children}</div>;
+// const Invest = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">Investment Portal{children}</div>;
 const Marketplace = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">E-commerce Marketplace{children}</div>;
 const Transactions = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">Transaction History{children}</div>;
-const About = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">About HydroFund{children}</div>;
 const Contact = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">Contact Us{children}</div>;
 const Profile = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">User Profile{children}</div>;
-const Settings = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">Account Settings{children}</div>;
-const Home = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">Welcome to HydroFund{children}</div>;
 const NotFound = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 p-4">404 - Page Not Found{children}</div>;
 
 function App() {
@@ -35,8 +36,8 @@ function App() {
 
         <Routes>
           {/* Public routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -44,15 +45,16 @@ function App() {
           {/* Protected routes */}
           <Route
             path="/dashboard"
-            element={user ? <Dashboard /> : <Login />}
+            element={user ? <AccountDashboard /> : <Login />}
           />
           <Route
             path="/join"
-            element={user ? <Dashboard /> : <Register />}
+            element={user ? <AccountDashboard /> : <Register />}
           />
+ 
           <Route
-            path="/invest"
-            element={user ? <Invest /> : <Login />}
+            path="/investments"
+            element={user ? <InvestmentProducts /> : <Login />}
           />
           <Route
             path="/marketplace"
@@ -68,12 +70,17 @@ function App() {
           />
           <Route
             path="/settings"
-            element={user ? <Settings /> : <Login />}
+            element={user ? <SettingsPage /> : <Login />}
           />
           <Route
             path="/account"
             element={user ? <AccountPage /> : <Login />}
           />
+          <Route
+            path="/deposit"
+            element={user ? <AccountPage /> : <Login />}
+          />
+
 
           {/* 404 catch-all - properly typed */}
           <Route path="*" element={<NotFound />} />
