@@ -42,3 +42,64 @@ export interface AuthResponse {
         token: string;
     }
 }
+
+export interface ReferredUser {
+    bonusAmount: string;
+    bonusStatus: string;
+    referred: {
+        email: string;
+        id:string
+    };
+}
+
+export interface Referrer {
+    referrer: {
+        email: string;
+    };
+}
+
+export interface LocalStorageUser {
+    token: string;
+    email: string;
+    id: string;
+}
+
+
+export interface BonusClaimResponse {
+    status: 'success' | 'error';
+    message: string;
+    data: boolean;
+}
+
+export interface BonusClaimRequest {
+    id: string;
+}
+
+export interface UserData {
+    id: string;
+    username: string;
+    email: string;
+    phone: string;
+    status: string;
+    balance: string;
+    twoFactorSecret: string | null;
+    vipTier: string;
+    totalInvested: string;
+    totalWithdrawn: string;
+    createdAt: string;
+    lastLogin: string;
+    profileComplete: boolean;
+    referredUsers: ReferredUser[];
+    referredBy: Referrer[];
+    referralCode: string
+    bonus: {
+        status: string;
+        bonusAmount:string
+    }
+}
+
+export interface UserResponse {
+    status: string;
+    message: string;
+    data: UserData;
+}

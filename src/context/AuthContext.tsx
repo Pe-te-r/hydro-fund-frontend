@@ -5,6 +5,7 @@ interface User {
     token: string;
     username?: string;
     email?: string;
+    id:string
 }
 
 interface AuthContextType {

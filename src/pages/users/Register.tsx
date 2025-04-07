@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-escape */
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { FiUser, FiMail, FiPhone, FiLock, FiGift, FiArrowRight } from 'react-icons/fi';
+import { FiUser, FiMail, FiPhone, FiLock, FiGift, FiArrowRight, } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import { useRegisterMutation } from '../../slice/auth';
 import { toast } from 'react-toastify';

@@ -1,11 +1,11 @@
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ReactNode, useState } from 'react';
+import { ReactNode } from 'react';
 import NavBar from './components/NavBar';
-import { SelectUser } from './types/type';
 import Register from './pages/users/Register';
 import Login from './pages/users/Login';
 import { useAuth } from './context/AuthContext';
+import AccountPage from './pages/users/Account';
 
 // Define props for our route components
 interface RouteComponentProps {
@@ -47,6 +47,10 @@ function App() {
             element={user ? <Dashboard /> : <Login />}
           />
           <Route
+            path="/join"
+            element={user ? <Dashboard /> : <Register />}
+          />
+          <Route
             path="/invest"
             element={user ? <Invest /> : <Login />}
           />
@@ -65,6 +69,10 @@ function App() {
           <Route
             path="/settings"
             element={user ? <Settings /> : <Login />}
+          />
+          <Route
+            path="/account"
+            element={user ? <AccountPage /> : <Login />}
           />
 
           {/* 404 catch-all - properly typed */}

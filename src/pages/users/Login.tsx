@@ -108,7 +108,7 @@ const Login = () => {
             const response = await sendLogin(credentials).unwrap();
 
             console.log('Login successful:', response);
-            login({token:response.data.token,email:response.data.user.email,username:response.data.user.username})
+            login({token:response.data.token,email:response.data.user.email,username:response.data.user.username,id:response.data.user.id})
             toast.success(response.message)
                         
             navigate('/dashboard');
