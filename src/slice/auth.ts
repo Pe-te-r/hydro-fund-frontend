@@ -1,34 +1,8 @@
 // services/authApi.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { AuthResponse, LoginRequest, RegisterRequest } from '../types/type';
 
 
-
-interface RegisterRequest {
-    username: string;
-    email: string;
-    phone: string;
-    password: string;
-    inviteCode?: string;
-}
-
-interface LoginRequest {
-    identifier: string; // Can be email, username, or phone
-    password: string;
-}
-
-interface AuthResponse {
-    status: string,
-    message: string,
-    data: {   
-        user: {
-            id: string;
-            username: string;
-            email: string;
-            phone: string;
-        };
-        token: string;
-    }
-}
 
 const ApiUrl ='http://localhost:3000'
 

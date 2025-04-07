@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FiUser, FiMail, FiPhone, FiLock, FiGift, FiArrowRight } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import { useRegisterMutation } from '../../slice/auth';
+import { toast } from 'react-toastify';
 
 const Register = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -69,7 +70,7 @@ const Register = () => {
         if (!formData.phone.trim()) {
             newErrors.phone = 'Phone number is required';
         } else if (!/^[\d\s\+\-\(\)]{10,15}$/.test(formData.phone)) {
-            newErrors.phoneNumber = 'Please enter a valid phone number';
+            newErrors.phone = 'Please enter a valid phone number';
         }
 
         if (!formData.password) {
@@ -78,8 +79,8 @@ const Register = () => {
             newErrors.password = 'Password must be at least 8 characters';
         }
 
-        if (formData.inviteCode && !/^\d{8}$/.test(formData.inviteCode)) {
-            newErrors.referralCode = 'Referral code must be 8 digits';
+        if (formData.inviteCode && !(formData.inviteCode.length === 8)) {
+            newErrors.inviteCode = 'Referral code must be 8 digits';
         }
 
         setErrors(newErrors);
@@ -110,10 +111,13 @@ const Register = () => {
 
                 console.log('Registration Response:', response);
 
+                
+
                 // Access the response data
                 if (response.status === 'success') {
                     console.log('User data:', response.data.user);
                     console.log('Token:', response.data.token);
+                    toast.success(response.message)
 
                     // Store token in localStorage or context
                     localStorage.setItem('token', response.data.token);
@@ -252,7 +256,7 @@ const Register = () => {
                                     maxLength={8}
                                 />
                             </div>
-                            {errors.referralCode && <p className="text-red-500 text-xs mt-1">{errors.inviteCode}</p>}
+                            {errors.inviteCode && <p className="text-red-500 text-xs mt-1">{errors.inviteCode}</p>}
                             {formData.inviteCode && (
                                 <p className="text-green-600 text-xs mt-1">
                                     Current referral URL: {window.location.origin}?ref={formData.inviteCode}

@@ -7,7 +7,10 @@ import {
     FiLock,
     FiArrowRight,
 } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import {   Link, useNavigate } from 'react-router-dom';
+import { useLoginMutation } from '../../slice/auth';
+import { toast } from 'react-toastify';
+import { ErrorResponse } from '../../types/type';
 
 type LoginMethod = 'username' | 'email' | 'phone';
 
@@ -72,22 +75,57 @@ const Login = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const [login,] = useLoginMutation();
+    const navigate=useNavigate()
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (validateForm()) {
-            setIsSubmitting(true);
+        if (!validateForm()) return;
 
-            // Simulate API call
-            setTimeout(() => {
-                console.log('Login Data:', {
-                    method: activeTab,
-                    identifier: formData[activeTab],
-                    password: formData.password
-                });
+        setIsSubmitting(true);
 
-                setIsSubmitting(false);
-            }, 1500);
+        try {
+            // Prepare credentials based on active tab
+            const credentials: { email?: string, phone?: string, username?: string, password: string } = {
+                password: formData.password
+            };
+
+            // Set the appropriate identifier based on active tab
+            switch (activeTab) {
+                case 'email':
+                    credentials.email = formData.email;
+                    break;
+                case 'username':
+                    credentials.username = formData.username;
+                    break;
+                case 'phone':
+                    credentials.phone = formData.phone;
+                    break;
+            }
+            console.log(credentials)
+            // Call the login mutation
+            const response = await login(credentials).unwrap();
+
+            console.log('Login successful:', response);
+            toast.success(response.message)
+            
+            // Handle successful login (store token, redirect, etc.)
+            localStorage.setItem('token', response.data.token);
+            
+            navigate('/');
+        } catch (err) {
+            const apiError = err as { status: number; data: ErrorResponse };
+            console.log(apiError)
+                if (apiError.data) {
+                    toast.error(apiError.data.message);
+                } else {
+                    toast.error('An unknown error occurred');
+                }
+            }
+
+        finally {
+            setIsSubmitting(false);
         }
     };
 
