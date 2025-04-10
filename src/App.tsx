@@ -11,6 +11,7 @@ import AccountDashboard from './pages/users/Dashboard';
 import HomePage from './pages/Home';
 import AboutPage from './pages/About';
 import InvestmentProducts from './pages/Invest';
+import DepositPage from './pages/users/DepositPage';
 
 // Define props for our route components
 interface RouteComponentProps {
@@ -78,7 +79,7 @@ function App() {
           />
           <Route
             path="/deposit"
-            element={user ? <AccountPage /> : <Login />}
+            element={user ? <DepositPage /> : <Login />}
           />
 
 

@@ -147,9 +147,11 @@ export default function AccountDashboard() {
                     <div className="bg-white rounded-xl shadow-md p-6">
                         <h3 className="text-lg font-medium text-gray-900 mb-4">Make a Deposit</h3>
                         <p className="text-sm text-gray-500 mb-4">Add funds to your account to start investing</p>
+                        <Link to='/deposit'>
                         <button className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
                             Deposit Funds
                         </button>
+                        </Link>
                     </div>
 
                     {/* Invest Card */}

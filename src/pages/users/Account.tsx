@@ -102,8 +102,8 @@ export default function AccountPage() {
     }
 
     const user = userData.data;
-    console.log(user)
-    const showAccountBonus = user.bonus?.status === 'pending';
+    console.log(user.referredUsers)
+    const showAccountBonus = user.bonus?.status === 'pending'
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-cyan-100 py-8 px-4 sm:px-6 lg:px-8">
