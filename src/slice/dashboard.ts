@@ -9,6 +9,7 @@ interface DashboardResponse {
     totalWithdrawn: number
     createdAt: string;
     vipTier: string
+    username: string;
     ownReferral: {
         referralCode:string
     }

@@ -57,7 +57,10 @@ export default function AccountDashboard() {
                 {/* Dashboard Header */}
                 <div className="text-center md:text-left">
                     <h1 className="text-3xl font-bold text-gray-900">Account Dashboard</h1>
-                    <p className="text-gray-600 mt-2">Welcome back! Here's your account summary</p>
+                    <p className="text-gray-600 mt-2">
+                        Welcome back <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent font-bold">{dashboardData?.username}</span>! Here's your account summary
+                    </p>
+                   
                 </div>
 
                 {/* Stats Row 1 */}
