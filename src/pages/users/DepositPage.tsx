@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { FiSmartphone, FiCreditCard, FiDollarSign, FiCheck, FiArrowRight } from 'react-icons/fi';
+import { FiSmartphone, FiCreditCard, FiDollarSign, FiCheck, FiArrowRight, FiClock, FiArrowLeft, FiUser } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
 
 export default function DepositPage() {
     const [paymentMethod, setPaymentMethod] = useState<'mpesa' | 'paypal' | 'stripe' | 'airtel'>('mpesa');
@@ -38,7 +39,25 @@ export default function DepositPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+        <div className=" bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+            {/* Header with navigation buttons */}
+            <div className="max-w-md mx-auto mt-3 mb-6 flex justify-between items-center">
+                <Link
+                    to="/investments"
+                    className="flex items-center text-blue-600 hover:text-blue-800"
+                >
+                    <FiArrowLeft className="mr-1" />
+                    Back to Investments
+                </Link>
+                <Link
+                    to="/account"
+                    className="flex items-center text-gray-700 hover:text-gray-900"
+                >
+                    <FiUser className="mr-1" />
+                    Account
+                </Link>
+            </div>
+
             <div className="max-w-md mx-auto">
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-gray-900">Deposit Funds</h1>
@@ -53,8 +72,8 @@ export default function DepositPage() {
                             <button
                                 onClick={() => setPaymentMethod('mpesa')}
                                 className={`p-3 border rounded-lg flex flex-col items-center ${paymentMethod === 'mpesa'
-                                        ? 'border-blue-500 bg-blue-50'
-                                        : 'border-gray-200 hover:bg-gray-50'
+                                    ? 'border-blue-500 bg-blue-50'
+                                    : 'border-gray-200 hover:bg-gray-50'
                                     }`}
                             >
                                 <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mb-2">
@@ -67,8 +86,8 @@ export default function DepositPage() {
                                 onClick={() => setPaymentMethod('paypal')}
                                 disabled
                                 className={`p-3 border rounded-lg flex flex-col items-center ${paymentMethod === 'paypal'
-                                        ? 'border-blue-500 bg-blue-50'
-                                        : 'border-gray-200 hover:bg-gray-50'
+                                    ? 'border-blue-500 bg-blue-50'
+                                    : 'border-gray-200 hover:bg-gray-50'
                                     } opacity-50 cursor-not-allowed`}
                                 title="Coming soon"
                             >
@@ -83,8 +102,8 @@ export default function DepositPage() {
                                 onClick={() => setPaymentMethod('stripe')}
                                 disabled
                                 className={`p-3 border rounded-lg flex flex-col items-center ${paymentMethod === 'stripe'
-                                        ? 'border-blue-500 bg-blue-50'
-                                        : 'border-gray-200 hover:bg-gray-50'
+                                    ? 'border-blue-500 bg-blue-50'
+                                    : 'border-gray-200 hover:bg-gray-50'
                                     } opacity-50 cursor-not-allowed`}
                                 title="Coming soon"
                             >
@@ -99,8 +118,8 @@ export default function DepositPage() {
                                 onClick={() => setPaymentMethod('airtel')}
                                 disabled
                                 className={`p-3 border rounded-lg flex flex-col items-center ${paymentMethod === 'airtel'
-                                        ? 'border-blue-500 bg-blue-50'
-                                        : 'border-gray-200 hover:bg-gray-50'
+                                    ? 'border-blue-500 bg-blue-50'
+                                    : 'border-gray-200 hover:bg-gray-50'
                                     } opacity-50 cursor-not-allowed`}
                                 title="Coming soon"
                             >
@@ -233,36 +252,6 @@ export default function DepositPage() {
                             </p>
                         </div>
                     )}
-                </div>
-
-                {/* Transaction History Preview */}
-                <div className="mt-6 bg-white rounded-xl shadow-md p-6">
-                    <h2 className="text-lg font-semibold text-gray-800 mb-3">Recent Deposits</h2>
-                    <div className="space-y-3">
-                        <div className="flex justify-between items-center p-2 border-b border-gray-100">
-                            <div>
-                                <p className="font-medium">M-Pesa Deposit</p>
-                                <p className="text-sm text-gray-500">Today, 10:45 AM</p>
-                            </div>
-                            <div className="text-right">
-                                <p className="font-medium text-green-600">+ KES 5,000</p>
-                                <p className="text-sm text-gray-500">Completed</p>
-                            </div>
-                        </div>
-                        <div className="flex justify-between items-center p-2 border-b border-gray-100">
-                            <div>
-                                <p className="font-medium">M-Pesa Deposit</p>
-                                <p className="text-sm text-gray-500">Yesterday, 3:22 PM</p>
-                            </div>
-                            <div className="text-right">
-                                <p className="font-medium text-green-600">+ KES 10,000</p>
-                                <p className="text-sm text-gray-500">Completed</p>
-                            </div>
-                        </div>
-                    </div>
-                    <button className="mt-4 w-full text-center text-blue-600 hover:text-blue-800 text-sm font-medium">
-                        View all transactions
-                    </button>
                 </div>
             </div>
 

@@ -12,6 +12,7 @@ import HomePage from './pages/Home';
 import AboutPage from './pages/About';
 import InvestmentProducts from './pages/Invest';
 import DepositPage from './pages/users/DepositPage';
+import WithdrawPage from './pages/users/withdraw';
 
 // Define props for our route components
 interface RouteComponentProps {
@@ -23,7 +24,6 @@ interface RouteComponentProps {
 const Marketplace = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">E-commerce Marketplace{children}</div>;
 const Transactions = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">Transaction History{children}</div>;
 const Contact = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">Contact Us{children}</div>;
-const Profile = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">User Profile{children}</div>;
 const NotFound = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 p-4">404 - Page Not Found{children}</div>;
 
 function App() {
@@ -66,9 +66,10 @@ function App() {
             element={user ? <Transactions /> : <Login />}
           />
           <Route
-            path="/profile"
-            element={user ? <Profile /> : <Login />}
+            path="/withdraw"
+            element={user ? <WithdrawPage /> : <Login />}
           />
+ 
           <Route
             path="/settings"
             element={user ? <SettingsPage /> : <Login />}

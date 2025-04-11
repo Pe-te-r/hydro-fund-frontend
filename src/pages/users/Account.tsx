@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import { useGetUserByIdQuery } from '../../slice/users';
 import { FiClipboard, FiLink } from 'react-icons/fi';
 import { useClaimBonusMutation, useAccounBonusMutation } from '../../slice/bonus';
+import { Link } from 'react-router-dom';
 
 export default function AccountPage() {
     const { user: authUser } = useAuth();
@@ -154,13 +155,25 @@ export default function AccountPage() {
                                 <div>
                                     <p className="text-gray-500 text-sm">Member Since</p>
                                     <p className="font-medium">
-                                        {new Date(user.createdAt).toLocaleDateString()}
-                                    </p>
+                                        {new Date(user.createdAt).toLocaleDateString('en-US', {
+                                            day: 'numeric',
+                                            month: 'long',
+                                            year: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                        })}                                    </p>
                                 </div>
                                 <div>
                                     <p className="text-gray-500 text-sm">Last Login</p>
                                     <p className="font-medium">
-                                        {new Date(user.lastLogin).toLocaleString()}
+                                        {new Date(user.lastLogin).toLocaleDateString('en-US', {
+                                            day: 'numeric',
+                                            month: 'long',
+                                            year: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                        })}
+
                                     </p>
                                 </div>
                             </div>
@@ -175,13 +188,13 @@ export default function AccountPage() {
                                 <div>
                                     <p className="text-gray-500 text-sm">Account Balance</p>
                                     <p className="text-2xl font-bold text-blue-600">
-                                        ${parseFloat(user.balance).toFixed(2)}
+                                        Ksh {parseFloat(user.balance).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                     </p>
                                 </div>
                                 <div>
                                     <p className="text-gray-500 text-sm">Total Invested</p>
                                     <p className="text-xl font-medium text-gray-800">
-                                        ${parseFloat(user.totalInvested).toFixed(2)}
+                                        Ksh {parseFloat(user.totalInvested).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                     </p>
                                 </div>
                             </div>
@@ -189,7 +202,7 @@ export default function AccountPage() {
                                 <div>
                                     <p className="text-gray-500 text-sm">Total Withdrawn</p>
                                     <p className="text-xl font-medium text-gray-800">
-                                        ${parseFloat(user.totalWithdrawn).toFixed(2)}
+                                        Ksh {parseFloat(user.totalWithdrawn).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                     </p>
                                 </div>
                                 <div>
@@ -202,6 +215,22 @@ export default function AccountPage() {
                                         )}
                                     </p>
                                 </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="grid grid-cols-2 gap-4 pt-4">
+                                <Link
+                                    to="/deposit"
+                                    className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg text-center font-medium transition-colors"
+                                >
+                                    Deposit
+                                </Link>
+                                <Link
+                                    to="/withdraw"
+                                    className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg text-center font-medium transition-colors"
+                                >
+                                    Withdraw
+                                </Link>
                             </div>
                         </div>
                     </div>
