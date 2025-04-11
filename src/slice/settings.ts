@@ -1,27 +1,40 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { UserResponse } from '../types/type';
+import { LocalStorageUser } from '../types/type';
 
-const ApiUrl = 'http://localhost:3000';
+const ApiUrl = 'http://localhost:3000/settings';
 
-interface LocalStorageUser {
-    token: string;
+// Type definitions
+interface UserSettings {
     email: string;
-    id: string;
+    username: string;
+    phone: string;
+    twoFactorSecret?: string;
+    twoFactorEnabled: boolean;
+    password: {
+        lastChanged: string;
+    };
 }
 
-// Define the update payload type
-interface UpdateSettingsPayload {
+interface SettingsResponse {
+    status: string;
+    message: string;
+    data: UserSettings;
+}
+
+interface UpdateSettingsRequest {
     id: string;
-    data: {
-        username?: string;
-        email?: string;
-        phone?: string;
-        password?: {
-            old: string;
-            new: string;
-        };
-        code?: string;
+    username?: string;
+    phone?: string;
+    password?: {
+        new: string;
+        old: string;
     };
+    twoFactorEnabled?: boolean;
+}
+
+interface UpdateSettingsResponse {
+    success: boolean;
+    message: string;
 }
 
 export const settingsApi = createApi({
@@ -43,38 +56,41 @@ export const settingsApi = createApi({
             return headers;
         },
     }),
+    tagTypes: ['Settings'], // For cache invalidation
     endpoints: (builder) => ({
-        // Existing query endpoint
-        settingsInfo: builder.query<UserResponse, string>({
-            query: (id) => `/settings/${id}`,
+        // Get user settings
+        settingsInfo: builder.query<SettingsResponse, string>({
+            query: (userId) => `/${userId}`,
+            providesTags: ['Settings'],
         }),
 
-        // New mutation endpoint for updates
-        updateSettings: builder.mutation<{ success: boolean; message: string }, UpdateSettingsPayload>({
-            query: ({ id, data }) => ({
-                url: `/settings/${id}`,
+        // Update user settings
+        updateSettings: builder.mutation<UpdateSettingsResponse, UpdateSettingsRequest>({
+            query: ({ id, ...body }) => ({
+                url: `/${id}`,
                 method: 'PATCH',
-                body: data,
+                body,
             }),
-            // Transform the response if needed
-            transformResponse: (response: { success: boolean; message: string }) => response,
-            // Invalidate cache for this user's data after successful update
-            onQueryStarted: async (_, { dispatch, queryFulfilled }) => {
-                try {
-                    await queryFulfilled;
-                    dispatch(settingsApi.util.invalidateTags(['Settings']));
-                } catch (error) {
-                    console.error('Failed to invalidate cache:', error);
-                }
-            },
+            invalidatesTags: ['Settings'], // Invalidate cache after update
+        }),
+
+        // Update two-factor authentication status
+        updateTwoFactorAuth: builder.mutation<UpdateSettingsResponse, {
+            id: string;
+            code: string;
+        }>({
+            query: ({ id, code }) => ({
+                url: `/${id}`,
+                method: 'PATCH',
+                body: { code },
+            }),
+            invalidatesTags: ['Settings'],
         }),
     }),
-    // Optional: Add tags for cache invalidation
-    tagTypes: ['Settings'],
 });
 
 export const {
     useSettingsInfoQuery,
-    useLazySettingsInfoQuery,
-    useUpdateSettingsMutation, // New mutation hook
+    useUpdateSettingsMutation,
+    useUpdateTwoFactorAuthMutation,
 } = settingsApi;

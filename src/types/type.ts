@@ -92,6 +92,7 @@ export interface UserData {
     referredUsers: ReferredUser[];
     referredBy: Referrer[];
     referralCode: string
+    twoFactorEnabled: boolean;
     bonus: {
         status: string;
         bonusAmount:string

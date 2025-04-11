@@ -4,16 +4,20 @@ import { authApi } from './slice/auth';
 import { userApi } from './slice/users';
 import { bonusApi } from './slice/bonus';
 import { settingsApi } from './slice/settings';
+import { emailApi } from './slice/sendEmail';
+import { dashboardApi } from './slice/dashboard';
 
 export const store = configureStore({
     reducer: {
         [userApi.reducerPath]: userApi.reducer,
         [settingsApi.reducerPath]: settingsApi.reducer,
         [authApi.reducerPath]: authApi.reducer,
+        [emailApi.reducerPath]: emailApi.reducer,
         [bonusApi.reducerPath]:bonusApi.reducer,
+        [dashboardApi.reducerPath]:dashboardApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(authApi.middleware, userApi.middleware, bonusApi.middleware, settingsApi.middleware),
+        getDefaultMiddleware().concat(authApi.middleware, userApi.middleware, bonusApi.middleware, settingsApi.middleware, emailApi.middleware,dashboardApi.middleware),
 });
 
 export type AppDispatch = typeof store.dispatch;

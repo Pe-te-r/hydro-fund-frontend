@@ -195,7 +195,7 @@ export default function AccountPage() {
                                 <div>
                                     <p className="text-gray-500 text-sm">Profile Complete</p>
                                     <p className="font-medium">
-                                        {user.profileComplete ? (
+                                        {user.twoFactorEnabled ? (
                                             <span className="text-green-600">Completed</span>
                                         ) : (
                                             <span className="text-amber-600">Incomplete</span>
