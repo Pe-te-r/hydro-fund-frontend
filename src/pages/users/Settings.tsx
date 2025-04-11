@@ -28,7 +28,7 @@ const mockData: UserSettings = {
 };
 
 export default function SettingsPage() {
-    const [data, setData] = useState<UserSettings>(mockData);
+    const [data] = useState<UserSettings>(mockData);
     const [isVerified, setIsVerified] = useState(false);
     const [otpInput, setOtpInput] = useState('');
     const [editingProfile, setEditingProfile] = useState(false);
