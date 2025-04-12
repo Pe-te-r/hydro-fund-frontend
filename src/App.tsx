@@ -13,6 +13,8 @@ import AboutPage from './pages/About';
 import InvestmentProducts from './pages/Invest';
 import DepositPage from './pages/users/DepositPage';
 import WithdrawPage from './pages/users/withdraw';
+import AdminDashboard from './pages/admin/AdminDash';
+import AdminUsersPage from './pages/admin/AdminUser';
 
 // Define props for our route components
 interface RouteComponentProps {
@@ -83,6 +85,13 @@ function App() {
             element={user ? <DepositPage /> : <Login />}
           />
 
+          {/* admin urls */}
+          <Route path='/admin'
+            element={user ? <AdminDashboard /> : <Login/>}
+          />
+          <Route path='/admin/users'
+            element={user ? <AdminUsersPage /> : <Login/>}
+          />
 
           {/* 404 catch-all - properly typed */}
           <Route path="*" element={<NotFound />} />

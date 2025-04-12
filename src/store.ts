@@ -6,6 +6,7 @@ import { bonusApi } from './slice/bonus';
 import { settingsApi } from './slice/settings';
 import { emailApi } from './slice/sendEmail';
 import { dashboardApi } from './slice/dashboard';
+import { adminUserApi } from './slice/admin/users';
 
 export const store = configureStore({
     reducer: {
@@ -15,9 +16,10 @@ export const store = configureStore({
         [emailApi.reducerPath]: emailApi.reducer,
         [bonusApi.reducerPath]:bonusApi.reducer,
         [dashboardApi.reducerPath]:dashboardApi.reducer,
+        [adminUserApi.reducerPath]: adminUserApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(authApi.middleware, userApi.middleware, bonusApi.middleware, settingsApi.middleware, emailApi.middleware,dashboardApi.middleware),
+        getDefaultMiddleware().concat(authApi.middleware, userApi.middleware, bonusApi.middleware, settingsApi.middleware, adminUserApi.middleware ,emailApi.middleware,dashboardApi.middleware),
 });
 
 export type AppDispatch = typeof store.dispatch;

@@ -3,9 +3,7 @@ import { Link } from 'react-router-dom';
 import {
     FiHome,
     FiInfo,
-    FiFileText,
     FiTrendingUp,
-    FiDollarSign,
     FiUser,
     FiSettings,
     FiPieChart,
@@ -13,16 +11,31 @@ import {
     FiLogIn,
     FiUserPlus,
     FiMenu,
-    FiX
-    
+    FiX,
+    FiShoppingCart
 } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext'; // Import cart context
 
 const NavBar = () => {
     const { isLoggedIn, logout } = useAuth();
-    // const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const { itemCount } = useCart(); // Get cart item count
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
+
+    // Navigation links configuration
+    const navLinks = [
+        { to: "/", icon: <FiHome />, text: "Home", show: true },
+        { to: "/about", icon: <FiInfo />, text: "About", show: true },
+        { to: "/investments", icon: <FiTrendingUp />, text: "Investments", show: isLoggedIn },
+    ];
+
+    // Account dropdown links configuration
+    const accountLinks = [
+        { to: "/dashboard", icon: <FiPieChart />, text: "Dashboard" },
+        { to: "/account", icon: <FiUser />, text: "Account" },
+        { to: "/settings", icon: <FiSettings />, text: "Settings" },
+    ];
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -39,11 +52,6 @@ const NavBar = () => {
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [isAccountDropdownOpen]);
-
-    // const toggleLogin = () => {
-    //     setIsLoggedIn(!isLoggedIn);
-    //     setIsAccountDropdownOpen(false);
-    // };
 
     return (
         <nav className="bg-gradient-to-r from-blue-600 to-blue-800 shadow-lg sticky top-0 z-50">
@@ -64,21 +72,30 @@ const NavBar = () => {
                     {/* Middle - Navigation links (desktop) */}
                     <div className="hidden md:block">
                         <div className="ml-10 flex items-center space-x-1">
-                            <NavLink to="/" icon={<FiHome />} text="Home" />
-                            <NavLink to="/about" icon={<FiInfo />} text="About" />
-                            {isLoggedIn &&
-                                <>
-                                <NavLink to="/contract" icon={<FiFileText />} text="Contract" />
-                                <NavLink to="/market" icon={<FiTrendingUp />} text="Market" />
-                                <NavLink to="/investments" icon={<FiDollarSign />} text="Investments" />
-                            </>
-                            }
+                            {navLinks.map((link) => (
+                                link.show && (
+                                    <NavLink key={link.to} to={link.to} icon={link.icon} text={link.text} />
+                                )
+                            ))}
                         </div>
                     </div>
 
                     {/* Right side - Auth/Account (desktop) */}
                     <div className="hidden md:block">
-                        <div className="ml-4 flex items-center md:ml-6">
+                        <div className="ml-4 flex items-center md:ml-6 space-x-4">
+                            {/* Cart Icon */}
+                            <Link
+                                to="/cart"
+                                className="relative p-2 text-white hover:bg-blue-700 rounded-full transition-colors"
+                            >
+                                <FiShoppingCart className="w-5 h-5" />
+                                {itemCount > 0 && (
+                                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                                        {itemCount}
+                                    </span>
+                                )}
+                            </Link>
+
                             {!isLoggedIn ? (
                                 <div className="flex space-x-2">
                                     <AuthLink
@@ -112,9 +129,9 @@ const NavBar = () => {
                                                 <p className="text-sm font-medium text-gray-900 truncate">Welcome back!</p>
                                             </div>
                                             <div className="py-1">
-                                                <DropdownLink to="/dashboard" icon={<FiPieChart />} text="Dashboard" />
-                                                <DropdownLink to="/account" icon={<FiUser />} text="Account" />
-                                                <DropdownLink to="/settings" icon={<FiSettings />} text="Settings" />
+                                                {accountLinks.map((link) => (
+                                                    <DropdownLink key={link.to} to={link.to} icon={link.icon} text={link.text} />
+                                                ))}
                                             </div>
                                             <div className="py-1">
                                                 <button
@@ -133,7 +150,20 @@ const NavBar = () => {
                     </div>
 
                     {/* Mobile menu button */}
-                    <div className="flex md:hidden items-center space-x-2">
+                    <div className="flex md:hidden items-center space-x-4">
+                        {/* Mobile Cart Icon */}
+                        <Link
+                            to="/cart"
+                            className="relative p-2 text-white hover:bg-blue-700 rounded-full transition-colors"
+                        >
+                            <FiShoppingCart className="w-5 h-5" />
+                            {itemCount > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                                    {itemCount}
+                                </span>
+                            )}
+                        </Link>
+
                         {!isLoggedIn ? (
                             <div className="flex space-x-1">
                                 <Link
@@ -147,7 +177,7 @@ const NavBar = () => {
                             <button
                                 type="button"
                                 className="flex max-w-xs items-center rounded-full bg-blue-700 text-sm focus:outline-none hover:bg-blue-600 transition-colors p-1 cursor-pointer"
-                                onClick={() => setIsAccountDropdownOpen(!isAccountDropdownOpen)}
+                                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                             >
                                 <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center text-white">
                                     <FiUser className="w-5 h-5" />
@@ -170,12 +200,39 @@ const NavBar = () => {
             {isMobileMenuOpen && (
                 <div className="md:hidden bg-blue-700">
                     <div className="space-y-1 px-2 pt-2 pb-3 sm:px-3">
-                        <MobileNavLink to="/" icon={<FiHome />} text="Home" />
-                        <MobileNavLink to="/about" icon={<FiInfo />} text="About" />
-                        <MobileNavLink to="/contract" icon={<FiFileText />} text="Contract" />
-                        <MobileNavLink to="/market" icon={<FiTrendingUp />} text="Market" />
-                        <MobileNavLink to="/investments" icon={<FiDollarSign />} text="Investments" />
+                        {navLinks.map((link) => (
+                            link.show && (
+                                <MobileNavLink
+                                    key={link.to}
+                                    to={link.to}
+                                    icon={link.icon}
+                                    text={link.text}
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                />
+                            )
+                        ))}
                     </div>
+
+                    {/* Conditional rendering for logged-in users */}
+                    {isLoggedIn && (
+                        <div className="border-t border-blue-600 pt-4 pb-3">
+                            <div className="px-4 mb-3">
+                                <p className="text-white text-sm font-medium">Account</p>
+                            </div>
+                            <div className="space-y-1 px-2">
+                                {accountLinks.map((link) => (
+                                    <MobileDropdownLink
+                                        key={link.to}
+                                        to={link.to}
+                                        icon={link.icon}
+                                        text={link.text}
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     <div className="border-t border-blue-600 pt-4 pb-3">
                         {!isLoggedIn ? (
                             <div className="flex space-x-2 px-2">
@@ -183,6 +240,9 @@ const NavBar = () => {
                                     to="/login"
                                     icon={<FiLogIn />}
                                     text="Login"
+                                    fullWidth
+                                    mobile
+                                    onClick={() => setIsMobileMenuOpen(false)}
                                 />
                                 <AuthLink
                                     to="/register"
@@ -190,21 +250,20 @@ const NavBar = () => {
                                     text="Register"
                                     fullWidth
                                     mobile
+                                    onClick={() => setIsMobileMenuOpen(false)}
                                 />
                             </div>
                         ) : (
-                            <div className="space-y-1 px-2">
-                                <MobileDropdownLink to="/account" icon={<FiUser />} text="Account" />
-                                <MobileDropdownLink to="/dashboard" icon={<FiPieChart />} text="Dashboard" />
-                                <MobileDropdownLink to="/settings" icon={<FiSettings />} text="Settings" />
-                                <button
-                                    onClick={logout}
-                                    className="w-full flex items-center px-3 py-2 rounded-md text-base font-medium text-white hover:bg-blue-600"
-                                >
-                                    <FiLogOut className="mr-2" />
-                                    Logout
-                                </button>
-                            </div>
+                            <button
+                                onClick={() => {
+                                    logout();
+                                    setIsMobileMenuOpen(false);
+                                }}
+                                className="w-full flex items-center px-3 py-2 rounded-md text-base font-medium text-white hover:bg-blue-600"
+                            >
+                                <FiLogOut className="mr-2" />
+                                Logout
+                            </button>
                         )}
                     </div>
                 </div>
@@ -213,7 +272,7 @@ const NavBar = () => {
     );
 };
 
-// Reusable NavLink component
+// Reusable components 
 const NavLink = ({ to, icon, text }: { to: string, icon: React.ReactNode, text: string }) => (
     <Link
         to={to}
@@ -226,11 +285,10 @@ const NavLink = ({ to, icon, text }: { to: string, icon: React.ReactNode, text: 
     </Link>
 );
 
-// Reusable MobileNavLink component
-const MobileNavLink = ({ to, icon, text, onClick }: { to: string, icon: React.ReactNode, text: string ,onClick?:()=>null}) => (
+const MobileNavLink = ({ to, icon, text, onClick }: { to: string, icon: React.ReactNode, text: string, onClick?: () => void }) => (
     <Link
         to={to}
-        className="text-white hover:bg-blue-600  px-3 py-2 rounded-md text-base font-medium flex items-center cursor-pointer"
+        className="text-white hover:bg-blue-600 px-3 py-2 rounded-md text-base font-medium flex items-center cursor-pointer"
         onClick={onClick}
     >
         <span className="mr-2">
@@ -240,22 +298,37 @@ const MobileNavLink = ({ to, icon, text, onClick }: { to: string, icon: React.Re
     </Link>
 );
 
-// Reusable AuthLink component
-const AuthLink = ({ to, icon, text, primary = false, fullWidth=false, mobile = false }: { to: string, icon: React.ReactNode, text: string, primary?: boolean,fullWidth?: boolean,mobile?:boolean }) => (
+const AuthLink = ({
+    to,
+    icon,
+    text,
+    primary = false,
+    fullWidth = false,
+    mobile = false,
+    onClick
+}: {
+    to: string,
+    icon: React.ReactNode,
+    text: string,
+    primary?: boolean,
+    fullWidth?: boolean,
+    mobile?: boolean,
+    onClick?: () => void
+}) => (
     <Link
         to={to}
+        onClick={onClick}
         className={`${primary ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'bg-white hover:bg-gray-100 text-blue-600'} 
-    ${fullWidth ? 'w-full' : ''} 
-    ${mobile ? 'px-3 py-2 text-base' : 'px-4 py-2 text-sm'} 
-    rounded-md font-medium transition-colors flex items-center justify-center space-x-2 cursor-pointer`}
+      ${fullWidth ? 'w-full' : ''} 
+      ${mobile ? 'px-3 py-2 text-base' : 'px-4 py-2 text-sm'} 
+      rounded-md font-medium transition-colors flex items-center justify-center space-x-2 cursor-pointer`}
     >
         {icon}
         <span>{text}</span>
     </Link>
 );
 
-// Reusable DropdownLink component
-const DropdownLink = ({ to, icon, text }:{to:string,icon:React.ReactNode,text:string}) => (
+const DropdownLink = ({ to, icon, text }: { to: string, icon: React.ReactNode, text: string }) => (
     <Link
         to={to}
         className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center cursor-pointer"
@@ -267,10 +340,10 @@ const DropdownLink = ({ to, icon, text }:{to:string,icon:React.ReactNode,text:st
     </Link>
 );
 
-// Reusable MobileDropdownLink component
-const MobileDropdownLink = ({ to, icon, text }: { to: string, icon: React.ReactNode, text: string }) => (
+const MobileDropdownLink = ({ to, icon, text, onClick }: { to: string, icon: React.ReactNode, text: string, onClick?: () => void }) => (
     <Link
         to={to}
+        onClick={onClick}
         className="px-3 py-2 rounded-md text-base font-medium text-white hover:bg-blue-600 flex items-center cursor-pointer"
     >
         <span className="mr-2">

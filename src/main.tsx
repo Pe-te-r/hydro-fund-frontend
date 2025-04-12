@@ -7,10 +7,13 @@ import './index.css'
 import App from './App.tsx'
 import { store } from './store.ts';
 import { AuthProvider } from './context/AuthContext';
+import { CartProvider } from './context/CartContext.tsx';
 
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    <CartProvider>
+
     <AuthProvider>
 
     <Provider store={store}>
@@ -18,6 +21,7 @@ createRoot(document.getElementById('root')!).render(
       <ToastContainer />
     </Provider>
     </AuthProvider>
+    </CartProvider>
   </StrictMode>,
 )
 
