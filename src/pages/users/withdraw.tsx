@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { FiArrowLeft, FiDollarSign, FiSmartphone, FiCheck, FiAlertCircle, FiLock } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { useWithdrawQuery } from '../../slice/withdraw';
+import { useRequestWithdrawalMutation, useWithdrawQuery } from '../../slice/withdraw';
 import { useAuth } from '../../context/AuthContext';
 
 export default function WithdrawPage() {
@@ -20,7 +20,7 @@ export default function WithdrawPage() {
 
     
     const {user:userData} = useAuth()
-    const { data } = useWithdrawQuery(userData ?.id || '')
+    const { data,refetch } = useWithdrawQuery(userData ?.id || '',{refetchOnFocus:true,refetchOnReconnect:true,refetchOnMountOrArgChange:true})
     type User = {
         phone: string;
         balance: number;
@@ -72,6 +72,25 @@ export default function WithdrawPage() {
         }
     }, [amount]);
 
+    const [sendWithdraw,{data:withdrawData,isSuccess,isError,error}] = useRequestWithdrawalMutation()
+    
+    useEffect(() => {
+        if (isSuccess) {
+            console.log(withdrawData)
+            toast(withdrawData.message)
+            refetch()
+            setShowConfirmation(true)
+            setIsSubmitting(false)
+
+        }
+        if (isError) {
+            setIsSubmitting(false)
+            
+            console.log(error)
+        }
+    }, [isSuccess,isError])
+    
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -88,25 +107,19 @@ export default function WithdrawPage() {
         setIsSubmitting(true);
 
         try {
-            // This would be the actual API call when you implement it
-            // const result = await useWithdrawQuery(amount).unwrap();
 
-            // For now, we'll simulate the API response
             const withdrawalData = {
                 phone: useAlternativeNumber ? alternativeNumber : user.phone,
                 amount: parseFloat(amount),
                 fee: transactionFee,
                 netAmount: willReceive,
-                currency: 'KES'
+                userId:userData?.id || ''
             };
-
+            sendWithdraw(withdrawalData)
             console.log('Withdrawal request:', withdrawalData);
 
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 1500));
 
-            setIsSubmitting(false);
-            setShowConfirmation(true);
+
 
         } catch (error) {
             console.error('Withdrawal failed:', error);
@@ -199,10 +212,11 @@ export default function WithdrawPage() {
                                                 <input
                                                     type="tel"
                                                     value={alternativeNumber}
+                                                    disabled={true}
                                                     onChange={(e) => setAlternativeNumber(e.target.value)}
                                                     className="block w-full pl-8 pr-12 py-3 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 rounded-md sm:text-sm"
                                                     placeholder="07XXXXXXXX"
-                                                    disabled={!useAlternativeNumber}
+                                                    // disabled={!useAlternativeNumber}
                                                 />
                                                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                                     <span className="text-gray-500 sm:text-sm">Coming Soon</span>

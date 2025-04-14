@@ -12,6 +12,15 @@ interface ResponseData{
     }
 }
 
+interface WithdrawRequest{
+    userId: string,
+    amount: number,
+    netAmount: number,
+    fee: number,
+    phone: string,
+    admin_info?:string,
+}
+
 export const withdrawApi = createApi({
     reducerPath: 'withdrawApi',
     baseQuery: fetchBaseQuery({
@@ -36,8 +45,15 @@ export const withdrawApi = createApi({
         withdraw: builder.query<ResponseData, string>({
             query: (userId) => `/${userId}`,
         }),
+        requestWithdrawal: builder.mutation<ResponseData, WithdrawRequest>({
+            query: (withdrawRequest) => ({
+                url: '', 
+                method: 'POST',
+                body: withdrawRequest,
+            }),
+        }),
 
     }),
 });
 
-export const { useWithdrawQuery} = withdrawApi;
+export const { useWithdrawQuery,useRequestWithdrawalMutation} = withdrawApi;

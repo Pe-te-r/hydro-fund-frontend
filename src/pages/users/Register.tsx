@@ -119,6 +119,8 @@ const Register = () => {
                 }
 
             } catch (err) {
+                const errInfo = err as { data: { status: string, message: string }, status: number }
+                toast.error(errInfo.data.message)
                 console.error('Registration Error:', err);
                 // Handle error (you can access error.data.message if your API returns it)
             } finally {
