@@ -15,6 +15,7 @@ import DepositPage from './pages/users/DepositPage';
 import WithdrawPage from './pages/users/withdraw';
 import AdminDashboard from './pages/admin/AdminDash';
 import AdminUsersPage from './pages/admin/AdminUser';
+import CartPage from './pages/cart';
 
 // Define props for our route components
 interface RouteComponentProps {
@@ -91,6 +92,9 @@ function App() {
           />
           <Route path='/admin/users'
             element={user ? <AdminUsersPage /> : <Login/>}
+          />
+          <Route path='/cart'
+            element={user ? <CartPage /> : <Login/>}
           />
 
           {/* 404 catch-all - properly typed */}
