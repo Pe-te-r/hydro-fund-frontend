@@ -2,11 +2,9 @@ import { useState, useEffect } from 'react';
 import { FiEdit, FiSave, FiEye, FiEyeOff, FiCopy, FiCheck, FiX } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import QRCode from 'react-qr-code';
-import { useSettingsInfoQuery } from '../../slice/settings';
+import { UserSettings, useSettingsInfoQuery } from '../../slice/settings';
 import { useAuth } from '../../context/AuthContext';
 import { CodeVerification } from '../../context/CodeVerification';
-
-
 
 interface ProfileData {
     email: string;
@@ -26,13 +24,11 @@ interface ShowPasswordFields {
     confirm: boolean;
 }
 
-
-
 const SettingsPage = () => {
     const { user } = useAuth();
-    const { data: settingsData, isLoading, isError } = useSettingsInfoQuery(user?.id || '');
-    const userData = settingsData?.data;
-    console.log(userData);
+    const { data: settingsData, isLoading, isError, refetch } = useSettingsInfoQuery(user?.id || '');
+
+    const [userData, setUserData] = useState<UserSettings | undefined>(settingsData?.data);
 
     // Profile state
     const [isEditingProfile, setIsEditingProfile] = useState<boolean>(false);
@@ -65,6 +61,14 @@ const SettingsPage = () => {
     const [show2FASetup, setShow2FASetup] = useState<boolean>(false);
     const [faValue, setFaValue] = useState<string>('');
 
+    // Effect to sync userData with settingsData
+    useEffect(() => {
+        if (settingsData?.data) {
+            setUserData(settingsData.data);
+        }
+    }, [settingsData]);
+
+    // Effect to update profileData when userData changes
     useEffect(() => {
         if (userData) {
             setProfileData({
@@ -74,6 +78,20 @@ const SettingsPage = () => {
             });
         }
     }, [userData]);
+
+    // Effect to handle profile updates
+    useEffect(() => {
+        if (profileCodeVerified) {
+            handleProfileUpdate();
+        }
+    }, [profileCodeVerified]);
+
+    // Effect to handle 2FA updates
+    useEffect(() => {
+        if (twoFACodeVerified) {
+            handle2FAUpdate();
+        }
+    }, [twoFACodeVerified]);
 
     if (isLoading) return <div>Loading settings...</div>;
     if (isError) return <div>Error loading settings</div>;
@@ -105,17 +123,35 @@ const SettingsPage = () => {
         setShowProfileCodeVerification(true);
     };
 
-    const handleProfileSave = (): void => {
-        console.log('Updated profile data:', profileData);
-        toast.success('Profile updated successfully');
-        setIsEditingProfile(false);
-        setProfileCodeVerified(false);
+    const handleProfileUpdate = async (): Promise<void> => {
+        try {
+            // In a real app, you would call your API here to update the profile
+            console.log('Profile update data:', profileData);
+
+            // Refetch to get the latest data from the database
+            const { data } = await refetch();
+
+            if (data?.data) {
+                console.log('Latest profile data from DB:', {
+                    email: data.data.email,
+                    username: data.data.username,
+                    phone: data.data.phone
+                });
+                setUserData(data?.data)
+            }
+
+            toast.success('Profile changes verified (check console for latest data)');
+            setIsEditingProfile(false);
+            setProfileCodeVerified(false);
+        } catch (error) {
+            console.log(error)
+            toast.error('Failed to verify profile changes');
+        }
     };
 
     const handlePasswordEdit = (): void => {
         setIsEditingPassword(true);
     };
-
 
     const handlePasswordCancel = (): void => {
         setIsEditingPassword(false);
@@ -134,15 +170,13 @@ const SettingsPage = () => {
         }
         setShowPasswordCodeVerification(true);
     };
-    const handle2FaSubmit = () => {
-        console.log('2fa code', faValue)
-    }
+
     const handlePasswordUpdate = (): void => {
         console.log('Password update data:', {
             old: passwordData.old,
             new: passwordData.new
         });
-        toast.success('Password updated successfully');
+        toast.success('Password changes verified (check console)');
         setIsEditingPassword(false);
         setPasswordCodeVerified(false);
         setPasswordData({ old: '', new: '', confirm: '' });
@@ -161,10 +195,33 @@ const SettingsPage = () => {
         }
     };
 
+    const handle2FAUpdate = async (): Promise<void> => {
+        try {
+            console.log('2FA verification code:', faValue);
 
+            // In a real app, you would call your API here to verify 2FA
+            // For now, we'll just refetch to simulate getting updated data
+            const { data } = await refetch();
+
+            if (data?.data) {
+                console.log('Latest 2FA status from DB:', {
+                    twoFactorEnabled: data.data.twoFactorEnabled,
+                    twoFactorSecret: data.data.twoFactorSecret
+                });
+            }
+
+            toast.success('2FA verified (check console for latest data)');
+            setShow2FASetup(false);
+            setFaValue('');
+            setTwoFACodeVerified(false);
+        } catch (error) {
+            console.log(error)
+            toast.error('Failed to verify 2FA code');
+        }
+    };
 
     const handleCodeVerificationComplete = (type: 'profile' | 'password' | '2fa', code: string): void => {
-        console.log(code)
+        console.log(`Verification code for ${type}:`, code);
         switch (type) {
             case 'profile':
                 setProfileCodeVerified(true);
@@ -261,10 +318,10 @@ const SettingsPage = () => {
                         <div className="pt-2">
                             {profileCodeVerified ? (
                                 <button
-                                    onClick={handleProfileSave}
+                                    onClick={handleProfileUpdate}
                                     className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
                                 >
-                                    <FiSave className="mr-1" /> Save Changes
+                                    <FiSave className="mr-1" /> Verify Changes
                                 </button>
                             ) : (
                                 <button
@@ -374,7 +431,7 @@ const SettingsPage = () => {
                                         onClick={handlePasswordUpdate}
                                         className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
                                     >
-                                        <FiSave className="mr-1" /> Update Password
+                                        <FiSave className="mr-1" /> Verify Password Change
                                     </button>
                                 ) : (
                                     <button
@@ -449,7 +506,7 @@ const SettingsPage = () => {
                                         </button>
                                     </div>
                                     <div className='mt-4'>
-                                        <label htmlFor="2fa">Enter otp code to verify</label>
+                                        <label htmlFor="2fa">Enter OTP code to verify</label>
                                         <input
                                             type="text"
                                             value={faValue}
@@ -461,7 +518,7 @@ const SettingsPage = () => {
 
                                     <div className="mt-4">
                                         <button
-                                            onClick={twoFACodeVerified? handle2FaSubmit :handle2FAVerify}
+                                            onClick={twoFACodeVerified ? handle2FAUpdate : handle2FAVerify}
                                             className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                                         >
                                             {twoFACodeVerified ? 'Submit'
@@ -482,7 +539,7 @@ const SettingsPage = () => {
             {/* Code Verification Modals */}
             {showProfileCodeVerification && (
                 <CodeVerification
-                    onVerify={(code:string) => handleCodeVerificationComplete('profile', code)}
+                    onVerify={(code: string) => handleCodeVerificationComplete('profile', code)}
                     onCancel={() => setShowProfileCodeVerification(false)}
                     verifyType="profile"
                 />
@@ -490,7 +547,7 @@ const SettingsPage = () => {
 
             {showPasswordCodeVerification && (
                 <CodeVerification
-                    onVerify={(code:string) => handleCodeVerificationComplete('password', code)}
+                    onVerify={(code: string) => handleCodeVerificationComplete('password', code)}
                     onCancel={() => setShowPasswordCodeVerification(false)}
                     verifyType="password"
                 />

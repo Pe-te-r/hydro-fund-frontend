@@ -4,7 +4,7 @@ import { LocalStorageUser } from '../types/type';
 const ApiUrl = 'http://localhost:3000/settings';
 
 // Type definitions
-interface UserSettings {
+export interface UserSettings {
     email: string;
     username: string;
     phone: string;

@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { FiArrowLeft, FiDollarSign, FiSmartphone, FiCheck, FiAlertCircle, FiLock } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useWithdrawQuery } from '../../slice/withdraw';
+import { useAuth } from '../../context/AuthContext';
 
 export default function WithdrawPage() {
     const [amount, setAmount] = useState('');
@@ -16,17 +18,33 @@ export default function WithdrawPage() {
     const MAX_WITHDRAWAL = 5000;
     const TRANSACTION_FEE_PERCENTAGE = 0.08;
 
-    // Mock user data
-    const user = {
-        phone: '0768543269',
-        balance: 1250.50,
-        // Calculate withdrawable amount considering the 8% fee for any amount
-        get withdrawable() {
-            // Maximum possible amount you can withdraw considering the fee
-            const maxAfterFee = this.balance / (1 + TRANSACTION_FEE_PERCENTAGE);
-            return Math.min(maxAfterFee, MAX_WITHDRAWAL);
-        }
+    
+    const {user:userData} = useAuth()
+    const { data } = useWithdrawQuery(userData ?.id || '')
+    type User = {
+        phone: string;
+        balance: number;
+        withdrawable:number;
     };
+
+    const [user, setUser] = useState<User>({
+        phone: '',
+        balance: 0,
+        withdrawable: 0.00
+    });
+
+   
+
+    useEffect(() => {
+        if (data?.data) {
+            const info = data.data;
+            console.log(info)
+            const maxAfterFee = info.amount / (1 + TRANSACTION_FEE_PERCENTAGE);
+            const withdrawable = Math.min(maxAfterFee, MAX_WITHDRAWAL);
+            setUser({ phone: info.phone, balance: info.amount, withdrawable });
+        }
+    }, [data]);
+
 
     // Calculate transaction fee
     const transactionFee = amount ? parseFloat(amount) * TRANSACTION_FEE_PERCENTAGE : 0;
@@ -54,7 +72,7 @@ export default function WithdrawPage() {
         }
     }, [amount]);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (amountError) {
@@ -69,19 +87,32 @@ export default function WithdrawPage() {
 
         setIsSubmitting(true);
 
-        // Simulate API call
-        setTimeout(() => {
-            console.log('Withdrawal request:', {
+        try {
+            // This would be the actual API call when you implement it
+            // const result = await useWithdrawQuery(amount).unwrap();
+
+            // For now, we'll simulate the API response
+            const withdrawalData = {
                 phone: useAlternativeNumber ? alternativeNumber : user.phone,
                 amount: parseFloat(amount),
                 fee: transactionFee,
                 netAmount: willReceive,
                 currency: 'KES'
-            });
+            };
+
+            console.log('Withdrawal request:', withdrawalData);
+
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 1500));
 
             setIsSubmitting(false);
             setShowConfirmation(true);
-        }, 1500);
+
+        } catch (error) {
+            console.error('Withdrawal failed:', error);
+            toast.error('Withdrawal request failed. Please try again.', { position: 'top-center' });
+            setIsSubmitting(false);
+        }
     };
 
     const handleConfirmationClose = () => {
@@ -116,7 +147,7 @@ export default function WithdrawPage() {
                         <div className="flex justify-between items-center">
                             <div>
                                 <p className="text-sm font-medium">Available Balance</p>
-                                <p className="text-2xl font-bold">Ksh {user.balance.toLocaleString()}</p>
+                                <p className="text-2xl font-bold">Ksh {Number(user.balance).toFixed(2).toLocaleString()}</p>
                             </div>
                             <div>
                                 <p className="text-sm font-medium">Withdrawable*</p>
@@ -341,7 +372,7 @@ export default function WithdrawPage() {
                             <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
                                 <FiCheck className="h-6 w-6 text-green-600" />
                             </div>
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">Withdrawal Request Received</h3>
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Withdrawal Request Submitted</h3>
                             <div className="space-y-3 text-left bg-gray-50 p-4 rounded-lg mb-4">
                                 <div className="flex justify-between">
                                     <span className="text-gray-600">Amount:</span>
@@ -361,7 +392,7 @@ export default function WithdrawPage() {
                                 </div>
                             </div>
                             <p className="text-gray-500 mb-6">
-                                Your withdrawal to {useAlternativeNumber ? alternativeNumber : user.phone} is being processed. You'll receive an SMS confirmation.
+                                Your withdrawal request to {useAlternativeNumber ? alternativeNumber : user.phone} has been submitted successfully and is pending admin approval. You'll receive an SMS confirmation once processed.
                             </p>
                             <button
                                 onClick={handleConfirmationClose}

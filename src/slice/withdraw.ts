@@ -1,25 +1,23 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { LocalStorageUser } from '../types/type';
+import {  LocalStorageUser } from '../types/type';
 
-const EmailUrl = 'http://localhost:3000/email';
+const ApiUrl = 'http://localhost:3000/withdraw';
 
-// Response format
-interface EmailResponse {
+interface ResponseData{
     status: string;
-    message: string;
-    data: boolean;
+    message: string
+    data: {
+        phone: string;
+        amount: number;
+    }
 }
 
-interface VerifyCodeRequest {
-    id: string;
-    code: string;
-}
-
-export const emailApi = createApi({
-    reducerPath: 'emailApi',
+export const withdrawApi = createApi({
+    reducerPath: 'withdrawApi',
     baseQuery: fetchBaseQuery({
-        baseUrl: EmailUrl,
+        baseUrl: ApiUrl,
         prepareHeaders: (headers) => {
+            // Safely get and parse user from localStorage
             const userString = localStorage.getItem('user');
             if (userString) {
                 try {
@@ -35,17 +33,11 @@ export const emailApi = createApi({
         },
     }),
     endpoints: (builder) => ({
-        sendEmail: builder.query<EmailResponse, string>({
+        withdraw: builder.query<ResponseData, string>({
             query: (userId) => `/${userId}`,
         }),
-        verifyCode: builder.mutation<EmailResponse, VerifyCodeRequest>({
-            query: ({ id, code }) => ({
-                url: `/${id}`,
-                method: 'POST',
-                body: { code },
-            }),
-        }),
+
     }),
 });
 
-export const { useSendEmailQuery,useVerifyCodeMutation } = emailApi;
+export const { useWithdrawQuery} = withdrawApi;
