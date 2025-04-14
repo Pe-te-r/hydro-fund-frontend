@@ -1,243 +1,510 @@
-import React, { useEffect, useState } from 'react';
-import dayjs from 'dayjs';
+import { useState, useEffect } from 'react';
+import { FiEdit, FiSave, FiEye, FiEyeOff, FiCopy, FiCheck, FiX } from 'react-icons/fi';
+import { toast } from 'react-toastify';
+import QRCode from 'react-qr-code';
+import { useSettingsInfoQuery } from '../../slice/settings';
+import { useAuth } from '../../context/AuthContext';
+import { CodeVerification } from '../../context/CodeVerification';
 
-const staticCode = '1234';
 
-interface UserSettings {
-    id: string;
+
+interface ProfileData {
     email: string;
     username: string;
     phone: string;
-    twoFactorSecret: string;
-    twoFactorEnabled: boolean;
-    password: {
-        lastChanged: string;
-    };
 }
 
-const mockData: UserSettings = {
-    id: '773c8ea0-97de-4b34-9113-0195b0e8b770',
-    email: 'shakirah@gmail.com',
-    username: 'shakirah',
-    phone: '0741195000',
-    twoFactorSecret: 'CAGA4M2MIIDWCSR3',
-    twoFactorEnabled: false,
-    password: {
-        lastChanged: '2025-04-11T13:09:17.029Z',
-    },
-};
+interface PasswordData {
+    old: string;
+    new: string;
+    confirm: string;
+}
 
-export default function SettingsPage() {
-    const [data] = useState<UserSettings>(mockData);
-    const [isVerified, setIsVerified] = useState(false);
-    const [otpInput, setOtpInput] = useState('');
-    const [editingProfile, setEditingProfile] = useState(false);
-    const [editingSecurity, setEditingSecurity] = useState(false);
-    const [form, setForm] = useState({
-        username: data.username,
-        phone: data.phone,
-        password: {
-            old: '',
-            new: '',
-        },
-        twoFactorEnabled: data.twoFactorEnabled,
+interface ShowPasswordFields {
+    old: boolean;
+    new: boolean;
+    confirm: boolean;
+}
+
+
+
+const SettingsPage = () => {
+    const { user } = useAuth();
+    const { data: settingsData, isLoading, isError } = useSettingsInfoQuery(user?.id || '');
+    const userData = settingsData?.data;
+    console.log(userData);
+
+    // Profile state
+    const [isEditingProfile, setIsEditingProfile] = useState<boolean>(false);
+    const [profileData, setProfileData] = useState<ProfileData>({
+        email: '',
+        username: '',
+        phone: ''
     });
+    const [showProfileCodeVerification, setShowProfileCodeVerification] = useState<boolean>(false);
+    const [profileCodeVerified, setProfileCodeVerified] = useState<boolean>(false);
+
+    // Password state
+    const [isEditingPassword, setIsEditingPassword] = useState<boolean>(false);
+    const [passwordData, setPasswordData] = useState<PasswordData>({
+        old: '',
+        new: '',
+        confirm: ''
+    });
+    const [showPasswordFields, setShowPasswordFields] = useState<ShowPasswordFields>({
+        old: false,
+        new: false,
+        confirm: false
+    });
+    const [showPasswordCodeVerification, setShowPasswordCodeVerification] = useState<boolean>(false);
+    const [passwordCodeVerified, setPasswordCodeVerified] = useState<boolean>(false);
+
+    // 2FA state
+    const [show2FACodeVerification, setShow2FACodeVerification] = useState<boolean>(false);
+    const [twoFACodeVerified, setTwoFACodeVerified] = useState<boolean>(false);
+    const [show2FASetup, setShow2FASetup] = useState<boolean>(false);
+    const [faValue, setFaValue] = useState<string>('');
 
     useEffect(() => {
-        if (otpInput === staticCode) {
-            setIsVerified(true);
-            console.log('Code verified!');
+        if (userData) {
+            setProfileData({
+                email: userData.email,
+                username: userData.username,
+                phone: userData.phone
+            });
         }
-    }, [otpInput]);
+    }, [userData]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        if (name.includes('password.')) {
-            setForm((prev) => ({
-                ...prev,
-                password: {
-                    ...prev.password,
-                    [name.split('.')[1]]: value,
-                },
-            }));
+    if (isLoading) return <div>Loading settings...</div>;
+    if (isError) return <div>Error loading settings</div>;
+    if (!userData) return <div>No user data found</div>;
+
+    const canEditPassword = (): boolean => {
+        if (!userData.password?.lastChanged) return true;
+        const lastChanged = new Date(userData.password.lastChanged);
+        const threeDaysAgo = new Date();
+        threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+        return lastChanged < threeDaysAgo;
+    };
+
+    const handleProfileEdit = (): void => {
+        setIsEditingProfile(true);
+    };
+
+    const handleProfileCancel = (): void => {
+        setIsEditingProfile(false);
+        setProfileCodeVerified(false);
+        setProfileData({
+            email: userData.email,
+            username: userData.username,
+            phone: userData.phone
+        });
+    };
+
+    const handleProfileVerify = (): void => {
+        setShowProfileCodeVerification(true);
+    };
+
+    const handleProfileSave = (): void => {
+        console.log('Updated profile data:', profileData);
+        toast.success('Profile updated successfully');
+        setIsEditingProfile(false);
+        setProfileCodeVerified(false);
+    };
+
+    const handlePasswordEdit = (): void => {
+        setIsEditingPassword(true);
+    };
+
+
+    const handlePasswordCancel = (): void => {
+        setIsEditingPassword(false);
+        setPasswordCodeVerified(false);
+        setPasswordData({ old: '', new: '', confirm: '' });
+    };
+
+    const handlePasswordVerify = (): void => {
+        if (passwordData.new !== passwordData.confirm) {
+            toast.error('New passwords do not match');
+            return;
+        }
+        if (passwordData.new.length < 6) {
+            toast.error('Password must be at least 6 characters');
+            return;
+        }
+        setShowPasswordCodeVerification(true);
+    };
+    const handle2FaSubmit = () => {
+        console.log('2fa code', faValue)
+    }
+    const handlePasswordUpdate = (): void => {
+        console.log('Password update data:', {
+            old: passwordData.old,
+            new: passwordData.new
+        });
+        toast.success('Password updated successfully');
+        setIsEditingPassword(false);
+        setPasswordCodeVerified(false);
+        setPasswordData({ old: '', new: '', confirm: '' });
+    };
+
+    const handle2FAVerify = (): void => {
+        setShow2FACodeVerification(true);
+    };
+
+    const handle2FAToggle = (): void => {
+        if (userData.twoFactorEnabled) {
+            console.log('Disabling 2FA');
+            toast.success('Two-factor authentication disabled');
         } else {
-            setForm((prev) => ({ ...prev, [name]: value }));
+            setShow2FASetup(true);
         }
     };
 
-    const handleSubmit = () => {
-        console.log('Submitted:', form);
+
+
+    const handleCodeVerificationComplete = (type: 'profile' | 'password' | '2fa', code: string): void => {
+        console.log(code)
+        switch (type) {
+            case 'profile':
+                setProfileCodeVerified(true);
+                setShowProfileCodeVerification(false);
+                break;
+            case 'password':
+                setPasswordCodeVerified(true);
+                setShowPasswordCodeVerification(false);
+                break;
+            case '2fa':
+                setTwoFACodeVerified(true);
+                setShow2FACodeVerification(false);
+                break;
+        }
     };
 
-    const canChangePassword = dayjs().diff(dayjs(data.password.lastChanged), 'day') > 3;
-
-    const handleSendCode = () => {
-        console.log('Sending OTP:', staticCode);
+    const copyToClipboard = (text: string): void => {
+        navigator.clipboard.writeText(text);
+        toast.success('Copied to clipboard');
     };
+
+    const twoFactorAuthURI = `otpauth://totp/HydroFund:${userData.email}?secret=${userData.twoFactorSecret}&issuer=HydroFund`;
 
     return (
-        <div className="min-h-screen bg-gray-100 py-10 px-6 md:px-20">
-            {!isVerified && (
-                <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg mb-6 shadow">
-                    <p className="text-sm text-blue-600 font-semibold">Enter Verification Code:</p>
-                    <input
-                        type="text"
-                        className="mt-2 p-2 w-full border rounded"
-                        placeholder="Enter code"
-                        value={otpInput}
-                        onChange={(e) => setOtpInput(e.target.value)}
-                    />
-                </div>
-            )}
+        <div className="max-w-4xl mx-auto p-6">
+            <h1 className="text-2xl font-bold mb-6">Settings</h1>
 
-            <div className="bg-white rounded-xl shadow p-6 space-y-10">
-                {/* Profile Section */}
-                <div>
-                    <div className="flex justify-between items-center border-b pb-3 mb-4">
-                        <h2 className="text-xl font-bold text-gray-700">Profile</h2>
-                        {!editingProfile && (
-                            <button
-                                onClick={() => {
-                                    setEditingProfile(true);
-                                    handleSendCode();
-                                }}
-                                className="text-blue-500 hover:underline"
-                            >
-                                Edit
-                            </button>
-                        )}
-                    </div>
-                    <div className="grid gap-4 md:grid-cols-2">
-                        <div>
-                            <label className="block text-sm text-gray-600">Email</label>
-                            <input
-                                disabled
-                                value={data.email}
-                                className="p-2 border rounded w-full bg-gray-100"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm text-gray-600">Username</label>
-                            <input
-                                disabled={!editingProfile}
-                                name="username"
-                                value={form.username}
-                                onChange={handleChange}
-                                className="p-2 border rounded w-full"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm text-gray-600">Phone</label>
-                            <input
-                                disabled={!editingProfile}
-                                name="phone"
-                                value={form.phone}
-                                onChange={handleChange}
-                                className="p-2 border rounded w-full"
-                            />
-                        </div>
-                    </div>
-                    {editingProfile && isVerified && (
-                        <div className="mt-4 flex justify-end">
-                            <button
-                                onClick={() => {
-                                    handleSubmit();
-                                    setEditingProfile(false);
-                                }}
-                                className="px-4 py-2 bg-green-500 text-white rounded"
-                            >
-                                Save
-                            </button>
-                        </div>
+            {/* Profile Section */}
+            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-semibold">Profile Information</h2>
+                    {!isEditingProfile ? (
+                        <button
+                            onClick={handleProfileEdit}
+                            className="flex items-center text-blue-600 hover:text-blue-800"
+                        >
+                            <FiEdit className="mr-1" /> Edit
+                        </button>
+                    ) : (
+                        <button
+                            onClick={handleProfileCancel}
+                            className="flex items-center text-gray-600 hover:text-gray-800"
+                        >
+                            <FiX className="mr-1" /> Cancel
+                        </button>
                     )}
                 </div>
 
-                {/* Security Section */}
-                <div>
-                    <div className="flex justify-between items-center border-b pb-3 mb-4">
-                        <h2 className="text-xl font-bold text-gray-700">Security</h2>
-                        {!editingSecurity && (
-                            <button
-                                onClick={() => {
-                                    setEditingSecurity(true);
-                                    handleSendCode();
-                                }}
-                                className="text-blue-500 hover:underline"
-                            >
-                                Edit
-                            </button>
-                        )}
-                    </div>
-
-                    {/* Password Section */}
-                    <div className="mb-6">
-                        <h3 className="text-md font-semibold text-gray-700 mb-2">Password</h3>
-                        <p className="text-sm text-gray-500 mb-2">
-                            Last changed: {dayjs(data.password.lastChanged).format('YYYY-MM-DD')}
-                        </p>
-                        {canChangePassword ? (
-                            editingSecurity && isVerified && (
-                                <div className="grid gap-4 md:grid-cols-2">
-                                    <input
-                                        type="password"
-                                        name="password.old"
-                                        placeholder="Old Password"
-                                        className="p-2 border rounded w-full"
-                                        value={form.password.old}
-                                        onChange={handleChange}
-                                    />
-                                    <input
-                                        type="password"
-                                        name="password.new"
-                                        placeholder="New Password"
-                                        className="p-2 border rounded w-full"
-                                        value={form.password.new}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-                            )
-                        ) : (
-                            <p className="text-red-500">Password cannot be changed within 3 days.</p>
-                        )}
-                    </div>
-
-                    {/* 2FA Section */}
+                <div className="space-y-4">
                     <div>
-                        <h3 className="text-md font-semibold text-gray-700 mb-2">Two-Factor Authentication</h3>
-                        <p className="text-sm text-gray-500 mb-2">
-                            Status: {form.twoFactorEnabled ? 'Enabled' : 'Disabled'}
-                        </p>
-                        {editingSecurity && isVerified && (
-                            <div className="flex items-center space-x-4">
-                                <button
-                                    onClick={() => {
-                                        const newValue = !form.twoFactorEnabled;
-                                        setForm({ ...form, twoFactorEnabled: newValue });
-                                        console.log('OTP to enable/disable 2FA:', staticCode);
-                                    }}
-                                    className="px-4 py-2 bg-blue-500 text-white rounded"
-                                >
-                                    {form.twoFactorEnabled ? 'Disable' : 'Enable'}
-                                </button>
-                            </div>
+                        <label className="block text-sm font-medium text-gray-700">Email</label>
+                        {isEditingProfile ? (
+                            <input
+                                type="email"
+                                value={profileData.email}
+                                onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
+                                disabled
+                            />
+                        ) : (
+                            <p className="mt-1">{profileData.email}</p>
                         )}
                     </div>
 
-                    {editingSecurity && isVerified && (
-                        <div className="mt-4 flex justify-end">
-                            <button
-                                onClick={() => {
-                                    handleSubmit();
-                                    setEditingSecurity(false);
-                                }}
-                                className="px-4 py-2 bg-green-500 text-white rounded"
-                            >
-                                Save
-                            </button>
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Username</label>
+                        {isEditingProfile ? (
+                            <input
+                                type="text"
+                                value={profileData.username}
+                                onChange={(e) => setProfileData({ ...profileData, username: e.target.value })}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
+                            />
+                        ) : (
+                            <p className="mt-1">{profileData.username}</p>
+                        )}
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700">Phone Number</label>
+                        {isEditingProfile ? (
+                            <input
+                                type="tel"
+                                value={profileData.phone}
+                                onChange={(e) => setProfileData({ ...profileData, phone: e.target.value })}
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
+                            />
+                        ) : (
+                            <p className="mt-1">{profileData.phone}</p>
+                        )}
+                    </div>
+
+                    {isEditingProfile && (
+                        <div className="pt-2">
+                            {profileCodeVerified ? (
+                                <button
+                                    onClick={handleProfileSave}
+                                    className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                                >
+                                    <FiSave className="mr-1" /> Save Changes
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={handleProfileVerify}
+                                    className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                                >
+                                    <FiCheck className="mr-1" /> Verify Changes
+                                </button>
+                            )}
                         </div>
                     )}
                 </div>
             </div>
+
+            {/* Security Section */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+                <h2 className="text-xl font-semibold mb-4">Security</h2>
+
+                {/* Password Subsection */}
+                <div className="mb-8">
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-medium">Password</h3>
+                        {!isEditingPassword && canEditPassword() && (
+                            <button
+                                onClick={handlePasswordEdit}
+                                className="flex items-center text-blue-600 hover:text-blue-800"
+                            >
+                                <FiEdit className="mr-1" /> Change Password
+                            </button>
+                        )}
+                        {isEditingPassword && (
+                            <button
+                                onClick={handlePasswordCancel}
+                                className="flex items-center text-gray-600 hover:text-gray-800"
+                            >
+                                <FiX className="mr-1" /> Cancel
+                            </button>
+                        )}
+                    </div>
+
+                    {isEditingPassword ? (
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Old Password</label>
+                                <div className="relative mt-1">
+                                    <input
+                                        type={showPasswordFields.old ? "text" : "password"}
+                                        value={passwordData.old}
+                                        onChange={(e) => setPasswordData({ ...passwordData, old: e.target.value })}
+                                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
+                                    />
+                                    <button
+                                        type="button"
+                                        className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                        onClick={() => setShowPasswordFields({ ...showPasswordFields, old: !showPasswordFields.old })}
+                                    >
+                                        {showPasswordFields.old ? <FiEyeOff /> : <FiEye />}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">New Password</label>
+                                <div className="relative mt-1">
+                                    <input
+                                        type={showPasswordFields.new ? "text" : "password"}
+                                        value={passwordData.new}
+                                        onChange={(e) => setPasswordData({ ...passwordData, new: e.target.value })}
+                                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
+                                    />
+                                    <button
+                                        type="button"
+                                        className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                        onClick={() => setShowPasswordFields({ ...showPasswordFields, new: !showPasswordFields.new })}
+                                    >
+                                        {showPasswordFields.new ? <FiEyeOff /> : <FiEye />}
+                                    </button>
+                                </div>
+                                <p className="mt-1 text-xs text-gray-500">Minimum 6 characters</p>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Confirm New Password</label>
+                                <div className="relative mt-1">
+                                    <input
+                                        type={showPasswordFields.confirm ? "text" : "password"}
+                                        value={passwordData.confirm}
+                                        onChange={(e) => setPasswordData({ ...passwordData, confirm: e.target.value })}
+                                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
+                                    />
+                                    <button
+                                        type="button"
+                                        className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                        onClick={() => setShowPasswordFields({ ...showPasswordFields, confirm: !showPasswordFields.confirm })}
+                                    >
+                                        {showPasswordFields.confirm ? <FiEyeOff /> : <FiEye />}
+                                    </button>
+                                </div>
+                                {passwordData.new && passwordData.confirm && passwordData.new !== passwordData.confirm && (
+                                    <p className="mt-1 text-xs text-red-500">Passwords don't match</p>
+                                )}
+                            </div>
+
+                            <div className="pt-2">
+                                {passwordCodeVerified ? (
+                                    <button
+                                        onClick={handlePasswordUpdate}
+                                        className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                                    >
+                                        <FiSave className="mr-1" /> Update Password
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={handlePasswordVerify}
+                                        className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                                    >
+                                        <FiCheck className="mr-1" /> Verify Password Change
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    ) : (
+                        <div>
+                            <p className="text-sm text-gray-600">
+                                Last changed: {new Date(userData.password.lastChanged).toLocaleDateString()}
+                            </p>
+                            {!canEditPassword() && (
+                                <p className="text-sm text-yellow-600 mt-1">
+                                    You can only change your password every 3 days. Next change available on {
+                                        new Date(new Date(userData.password.lastChanged).getTime() + 3 * 24 * 60 * 60 * 1000
+                                        ).toLocaleDateString()}
+                                </p>
+                            )}
+                        </div>
+                    )}
+                </div>
+
+                {/* Two-Factor Authentication Subsection */}
+                <div>
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-medium">Two-Factor Authentication</h3>
+                        <button
+                            onClick={!userData.twoFactorEnabled ? handle2FAToggle : handle2FAVerify}
+                            className={`px-4 py-2 rounded-md ${userData.twoFactorEnabled
+                                ? 'bg-red-100 text-red-800 hover:bg-red-200'
+                                : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+                                }`}
+                        >
+                            {userData.twoFactorEnabled ? 'Disable' : 'Enable'}
+                        </button>
+                    </div>
+
+                    <p className="text-sm text-gray-600 mb-4">
+                        {userData.twoFactorEnabled
+                            ? 'Two-factor authentication is currently enabled.'
+                            : 'Two-factor authentication adds an extra layer of security to your account.'}
+                    </p>
+
+                    {show2FASetup && !userData.twoFactorEnabled && (
+                        <div className="bg-gray-50 p-4 rounded-md">
+                            <h4 className="font-medium mb-2">Set Up Two-Factor Authentication</h4>
+                            <p className="text-sm text-gray-600 mb-4">
+                                Scan the QR code below with your authenticator app or enter the code manually.
+                            </p>
+
+                            <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+                                <div className="bg-white p-2 rounded">
+                                    <QRCode value={twoFactorAuthURI} size={128} />
+                                </div>
+
+                                <div>
+                                    <p className="text-sm font-medium mb-2">Manual Entry</p>
+                                    <div className="flex items-center">
+                                        <code className="bg-gray-200 px-3 py-1 rounded-md mr-2">
+                                            {userData.twoFactorSecret}
+                                        </code>
+                                        <button
+                                            onClick={() => copyToClipboard(userData.twoFactorSecret || '')}
+                                            className="text-blue-600 hover:text-blue-800 flex items-center"
+                                        >
+                                            <FiCopy className="mr-1" /> Copy
+                                        </button>
+                                    </div>
+                                    <div className='mt-4'>
+                                        <label htmlFor="2fa">Enter otp code to verify</label>
+                                        <input
+                                            type="text"
+                                            value={faValue}
+                                            name='2fa'
+                                            onChange={(e) => setFaValue(e.target.value)}
+                                            className="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
+                                        />
+                                    </div>
+
+                                    <div className="mt-4">
+                                        <button
+                                            onClick={twoFACodeVerified? handle2FaSubmit :handle2FAVerify}
+                                            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                                        >
+                                            {twoFACodeVerified ? 'Submit'
+                                                :
+                                                <>
+                                                    <FiCheck className="mr-1" /> Verify Code
+                                                </>
+                                            }
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Code Verification Modals */}
+            {showProfileCodeVerification && (
+                <CodeVerification
+                    onVerify={(code:string) => handleCodeVerificationComplete('profile', code)}
+                    onCancel={() => setShowProfileCodeVerification(false)}
+                    verifyType="profile"
+                />
+            )}
+
+            {showPasswordCodeVerification && (
+                <CodeVerification
+                    onVerify={(code:string) => handleCodeVerificationComplete('password', code)}
+                    onCancel={() => setShowPasswordCodeVerification(false)}
+                    verifyType="password"
+                />
+            )}
+
+            {show2FACodeVerification && (
+                <CodeVerification
+                    onVerify={(code) => handleCodeVerificationComplete('2fa', code)}
+                    onCancel={() => setShow2FACodeVerification(false)}
+                    verifyType="2fa"
+                />
+            )}
         </div>
     );
-}
+};
+
+export default SettingsPage;
