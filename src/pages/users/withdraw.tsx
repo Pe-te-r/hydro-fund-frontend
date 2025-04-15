@@ -311,7 +311,7 @@ export default function WithdrawPage() {
                                         </div>
                                         <div className="flex justify-between">
                                             <span className="text-sm text-gray-600">Total deduction:</span>
-                                            <span className="text-sm font-medium text-red-600">Ksh {totalDeduction.toFixed(2)}</span>
+                                            <span className="text-sm font-medium text-red-600">Ksh {parseFloat(amount).toLocaleString()}</span>
                                         </div>
                                         <div className="flex justify-between pt-2 border-t border-gray-200">
                                             <span className="text-sm text-gray-600">You will receive:</span>
@@ -325,7 +325,7 @@ export default function WithdrawPage() {
                             <button
                                 type="submit"
                                 disabled={isSubmitting || !!amountError || !amount || (useAlternativeNumber && !alternativeNumber)}
-                                className={`mt-8 w-full py-3 px-4 bg-blue-600 text-white font-medium rounded-lg flex items-center justify-center ${isSubmitting || !!amountError || !amount || (useAlternativeNumber && !alternativeNumber)
+                                className={`mt-8 w-full cursor-pointer py-3 px-4 bg-blue-600 text-white font-medium rounded-lg flex items-center justify-center ${isSubmitting || !!amountError || !amount || (useAlternativeNumber && !alternativeNumber)
                                     ? 'opacity-75 cursor-not-allowed'
                                     : 'hover:bg-blue-700'
                                     }`}
@@ -402,7 +402,7 @@ export default function WithdrawPage() {
                                 </div>
                                 <div className="flex justify-between pt-2 border-t border-gray-200">
                                     <span className="text-gray-600">You'll receive:</span>
-                                    <span className="font-medium text-green-600">Ksh {willReceive.toFixed(2)}</span>
+                                    <span className="font-medium text-green-600">Ksh {parseFloat(amount).toLocaleString()}</span>
                                 </div>
                             </div>
                             <p className="text-gray-500 mb-6">
@@ -410,7 +410,7 @@ export default function WithdrawPage() {
                             </p>
                             <button
                                 onClick={handleConfirmationClose}
-                                className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                                className="w-full cursor-pointer py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                             >
                                 Done
                             </button>

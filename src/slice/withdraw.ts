@@ -44,7 +44,7 @@ export const withdrawApi = createApi({
         },
     }),
     endpoints: (builder) => ({
-        withdraw: builder.query<ResponseData, string>({
+        withdraw: builder.query<ResponseData,string>({
             query: (userId) => `/${userId}`,
         }),
         requestWithdrawal: builder.mutation<ResponseData, WithdrawRequest>({
@@ -55,13 +55,16 @@ export const withdrawApi = createApi({
             }),
         }),
 
-        histroyRequest: builder.query<HistoryType, string>({
-            query: (userId) => `/transactions/${userId}`
+        histroyRequest: builder.query<HistoryType,string>({
+            query: (userId) => ({
+                url: `/transactions/${userId}`,
+            }),
         }),
-        cancelWithdraw: builder.mutation<ApiResponseType, string>({
-            query: (id) => ({
-                url: `/cancel/${id}`, // Update to your actual endpoint
-                method: 'POST', // Consider using POST for state-changing operations
+        cancelWithdraw: builder.mutation<ApiResponseType, { id: string; admin?: boolean }>({
+            query: ({ id ,admin}) => ({
+                url: `/cancel/${id}`,
+                params: admin ? { admin: 'true' } : undefined,
+                method: 'POST',
             }),
         })
 

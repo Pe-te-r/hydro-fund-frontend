@@ -17,6 +17,7 @@ import AdminDashboard from './pages/admin/AdminDash';
 import AdminUsersPage from './pages/admin/AdminUser';
 import CartPage from './pages/cart';
 import TransactionHistoryPage from './pages/users/TransactionHistoryPage';
+import AdminWithdrawalsPage from './pages/admin/AdminWithdrawalsPage';
 
 // Define props for our route components
 interface RouteComponentProps {
@@ -94,6 +95,9 @@ function App() {
           />
           <Route path='/admin/users'
             element={user ? <AdminUsersPage /> : <Login/>}
+          />
+          <Route path='/admin/transactions'
+            element={user ? <AdminWithdrawalsPage /> : <Login/>}
           />
           <Route path='/cart'
             element={user ? <CartPage /> : <Login/>}

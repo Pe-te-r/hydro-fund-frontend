@@ -36,7 +36,7 @@ export default function TransactionHistoryPage() {
         isLoading,
         error,
         refetch
-    } = useHistroyRequestQuery(user?.id || '', {
+    } = useHistroyRequestQuery(user?.id || '',{
         refetchOnFocus: true,
         refetchOnReconnect: true,
         refetchOnMountOrArgChange: true
@@ -77,13 +77,11 @@ export default function TransactionHistoryPage() {
     const handleCancel = async (transactionId: string) => {
         if (window.confirm('Are you sure you want to cancel this transaction?')) {
             try {
-                // Execute the mutation
-                const result = await cancelWithdraw(transactionId).unwrap();
+                const result = await cancelWithdraw({id:transactionId}).unwrap();
 
-                if (result.status === 'success') {
-                    // Refetch the transaction list on success
-                    await refetch();
-                    // Optional: Show success message
+                if (result.status) {
+                    await refetch(); 
+                    console.log(result)
                     toast.success(result.message || 'Transaction canceled successfully');
                 } else {
                     toast.error(result.message || 'Failed to cancel transaction');
@@ -190,7 +188,7 @@ export default function TransactionHistoryPage() {
                 <button
                     onClick={handleRefresh}
                     disabled={isRefreshing}
-                    className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    className="inline-flex items-center cursor-pointer px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                     {isRefreshing ? (
                         <FiRefreshCw className="animate-spin mr-2 h-4 w-4" />
@@ -283,9 +281,9 @@ export default function TransactionHistoryPage() {
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        handleCancel(transaction.id);
+                                                         handleCancel(transaction.id);
                                                     }}
-                                                    className="text-red-600 hover:text-red-900"
+                                                    className="text-red-600 cursor-pointer hover:text-red-900"
                                                     disabled={isCancelling}
                                                 >
                                                     {isCancelling ? 'Canceling...' : 'Cancel'}

@@ -117,7 +117,12 @@ export interface Transaction {
     admin_info: string | null;
     status: TransactionStatus;
     createdAt: string;
-    processedAt: string | null;
+    processedAt?: string | null;
+    user?: {
+        balance: string;
+        email: string;
+        vipTier: string;
+    }
 }
 
 

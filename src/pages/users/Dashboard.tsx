@@ -7,7 +7,7 @@ import { useGetDashboardByIdQuery } from '../../slice/dashboard';
 
 export default function AccountDashboard() {
     const { user } = useAuth();
-    const { data: dashboardData, isLoading, isError } = useGetDashboardByIdQuery(user?.id || '');
+    const { data: dashboardData, isLoading, isError } = useGetDashboardByIdQuery(user?.id || '',{refetchOnFocus:true,refetchOnReconnect:true,refetchOnMountOrArgChange:true});
     const [copied, setCopied] = useState(false);
 
     const formatVipTier = (tier: string) => {
