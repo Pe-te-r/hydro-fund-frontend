@@ -16,6 +16,7 @@ import WithdrawPage from './pages/users/withdraw';
 import AdminDashboard from './pages/admin/AdminDash';
 import AdminUsersPage from './pages/admin/AdminUser';
 import CartPage from './pages/cart';
+import TransactionHistoryPage from './pages/users/TransactionHistoryPage';
 
 // Define props for our route components
 interface RouteComponentProps {
@@ -25,7 +26,6 @@ interface RouteComponentProps {
 // Create components with proper typing
 // const Invest = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">Investment Portal{children}</div>;
 const Marketplace = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">E-commerce Marketplace{children}</div>;
-const Transactions = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">Transaction History{children}</div>;
 const Contact = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">Contact Us{children}</div>;
 const NotFound = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 p-4">404 - Page Not Found{children}</div>;
 
@@ -64,10 +64,8 @@ function App() {
             path="/marketplace"
             element={user ? <Marketplace /> : <Login />}
           />
-          <Route
-            path="/transactions"
-            element={user ? <Transactions /> : <Login />}
-          />
+
+          
           <Route
             path="/withdraw"
             element={user ? <WithdrawPage /> : <Login />}
@@ -84,6 +82,10 @@ function App() {
           <Route
             path="/deposit"
             element={user ? <DepositPage /> : <Login />}
+          />
+          
+          <Route path='/transactions'
+            element={user ? <TransactionHistoryPage /> : <Login/>}
           />
 
           {/* admin urls */}

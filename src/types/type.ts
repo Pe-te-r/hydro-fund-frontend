@@ -104,3 +104,33 @@ export interface UserResponse {
     message: string;
     data: UserData;
 }
+
+type TransactionStatus = 'pending' | 'completed' | 'rejected' | 'failed';
+
+export interface Transaction {
+    id: string;
+    userId: string;
+    amount: string;
+    netAmount: string;
+    fee: string;
+    phone: string;
+    admin_info: string | null;
+    status: TransactionStatus;
+    createdAt: string;
+    processedAt: string | null;
+}
+
+
+interface ApiResponse<T> {
+    status: 'success' | 'error';
+    message: string;
+    data: T | string ;
+}
+
+export interface ApiResponseType{
+    status: 'success' | 'error';
+    message: string;
+    data?: unknown;
+}
+
+export type HistoryType = ApiResponse<Transaction>;

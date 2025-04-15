@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import {  LocalStorageUser } from '../types/type';
+import {   ApiResponseType, HistoryType, LocalStorageUser } from '../types/type';
 
 const ApiUrl = 'http://localhost:3000/withdraw';
 
@@ -20,6 +20,8 @@ interface WithdrawRequest{
     phone: string,
     admin_info?:string,
 }
+
+
 
 export const withdrawApi = createApi({
     reducerPath: 'withdrawApi',
@@ -53,7 +55,17 @@ export const withdrawApi = createApi({
             }),
         }),
 
+        histroyRequest: builder.query<HistoryType, string>({
+            query: (userId) => `/transactions/${userId}`
+        }),
+        cancelWithdraw: builder.mutation<ApiResponseType, string>({
+            query: (id) => ({
+                url: `/cancel/${id}`, // Update to your actual endpoint
+                method: 'POST', // Consider using POST for state-changing operations
+            }),
+        })
+
     }),
 });
 
-export const { useWithdrawQuery,useRequestWithdrawalMutation} = withdrawApi;
+export const { useWithdrawQuery,useRequestWithdrawalMutation,useHistroyRequestQuery,useCancelWithdrawMutation} = withdrawApi;
