@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import {
     useHistroyRequestQuery,
-    useCancelWithdrawMutation
+    useCancelWithdrawMutation,
+    useAllHistoryQuery
 } from '../../slice/withdraw';
 import {
     FiRefreshCw,
@@ -24,7 +25,7 @@ const AdminWithdrawalsPage = () => {
         isLoading,
         isError,
         refetch
-    } = useHistroyRequestQuery({ userId: 'admin', admin: true });
+    } = useAllHistoryQuery();
 
     const [cancelWithdrawal] = useCancelWithdrawMutation();
 
@@ -49,7 +50,7 @@ const AdminWithdrawalsPage = () => {
         const reason = prompt('Please enter rejection reason:');
         if (reason) {
             try {
-                await cancelWithdrawal({ id, admin: true }).unwrap();
+                await cancelWithdrawal({ id, admin: true,reason }).unwrap();
                 refetch();
             } catch (error) {
                 console.error('Failed to reject withdrawal:', error);
@@ -57,6 +58,7 @@ const AdminWithdrawalsPage = () => {
         }
     };
 
+    console.log(data)
     const getStatusBadge = (status: string) => {
         const baseClasses = "px-2 py-1 rounded-full text-xs font-semibold";
         switch (status) {

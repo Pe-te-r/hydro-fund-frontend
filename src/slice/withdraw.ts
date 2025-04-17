@@ -44,6 +44,9 @@ export const withdrawApi = createApi({
         },
     }),
     endpoints: (builder) => ({
+        allHistory: builder.query<HistoryType,null>({
+            query:() =>'/all'
+        }),
         withdraw: builder.query<ResponseData,string>({
             query: (userId) => `/${userId}`,
         }),
@@ -60,15 +63,16 @@ export const withdrawApi = createApi({
                 url: `/transactions/${userId}`,
             }),
         }),
-        cancelWithdraw: builder.mutation<ApiResponseType, { id: string; admin?: boolean }>({
-            query: ({ id ,admin}) => ({
-                url: `/cancel/${id}`,
-                params: admin ? { admin: 'true' } : undefined,
+        cancelWithdraw: builder.mutation<ApiResponseType, { id: string; admin?: boolean,reason?:string }>({
+            query: ({ id, admin,reason }) => ({
+                url: admin ? `/cancel/${id}?admin=true` : `/cancel/${id}`,
+                // params: admin ? { admin: 'true' } : undefined,
+                body: {reason},
                 method: 'POST',
             }),
         })
-
+        
     }),
 });
 
-export const { useWithdrawQuery,useRequestWithdrawalMutation,useHistroyRequestQuery,useCancelWithdrawMutation} = withdrawApi;
+export const { useWithdrawQuery,useRequestWithdrawalMutation,useHistroyRequestQuery, useAllHistoryQuery,useCancelWithdrawMutation} = withdrawApi;
