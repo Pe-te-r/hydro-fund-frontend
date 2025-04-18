@@ -9,6 +9,7 @@ const CartPage = () => {
         itemCount,
         removeFromCart,
         deleteItem,
+        addToCart,
         clearCart
     } = useCart();
 
@@ -65,6 +66,7 @@ const CartPage = () => {
                         <div className="divide-y divide-gray-200">
                             {cartItems.map(item => {
                                 const product = getProductDetails(item.id);
+                                console.log(product)
                                 return (
                                     <div key={item.id} className="p-4 sm:p-6">
                                         <div className="flex flex-col sm:flex-row sm:items-center">
@@ -115,12 +117,12 @@ const CartPage = () => {
                                                             if (product) {
                                                                 addToCart({
                                                                     id: product.id,
-                                                                    name: product.name,
+                                                                    // name: product.name,
                                                                     price: product.price,
-                                                                    quantity: 1,
-                                                                    cycle: product.cycle,
-                                                                    dailyIncome: product.dailyIncome,
-                                                                    totalIncome: product.totalIncome
+                                                                    // quantity: 1,
+                                                                    // cycle: product.cycle,
+                                                                    // dailyIncome: product.dailyIncome,
+                                                                    // totalIncome: product.totalIncome
                                                                 });
                                                             }
                                                         }}

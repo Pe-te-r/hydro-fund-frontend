@@ -1,6 +1,10 @@
 import { FiArrowRight, FiShield, FiPieChart, FiUsers, FiSmartphone, FiDollarSign, FiMail, FiMessageSquare } from 'react-icons/fi';
+import { useAuth } from '../context/AuthContext';
+import { Link } from 'react-router-dom';
+
 
 export default function HomePage() {
+    const {user} = useAuth()
     return (
         <div className="bg-gradient-to-b from-blue-50 to-white">
             {/* Hero Section */}
@@ -13,13 +17,21 @@ export default function HomePage() {
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-10">
                         Empowering Dreams, One Drop at a Time
                     </p>
+
                     <div className="flex flex-col sm:flex-row justify-center gap-4">
-                        <button className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-lg transition-all transform hover:scale-105">
-                            Get Started
-                        </button>
+                        {
+                            !user&&
+                        <Link to='/register'>
+                            <button className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-lg transition-all transform hover:scale-105">
+                                Get Started
+                            </button>                    
+                        </Link>
+                        }
+
+                        <Link to='/about'>
                         <button className="px-8 py-4 bg-white hover:bg-gray-50 text-blue-600 font-medium rounded-lg shadow-md border border-blue-200 transition-all">
-                            Learn More
-                        </button>
+                        Learn More</button>
+                        </Link>
                     </div>
                 </div>
             </section>
@@ -132,12 +144,18 @@ export default function HomePage() {
                         Join thousands of users who are already benefiting from our innovative platform.
                     </p>
                     <div className="flex flex-col sm:flex-row justify-center gap-4">
-                        <button className="px-8 py-4 bg-white hover:bg-gray-100 text-blue-600 font-medium rounded-lg shadow-lg transition-all transform hover:scale-105">
-                            Register Now
-                        </button>
+                        {!user &&
+                        <Link to='/register'>
+                            <button className="px-8 py-4 bg-white hover:bg-gray-100 text-blue-600 font-medium rounded-lg shadow-lg transition-all transform hover:scale-105">
+                                Register Now
+                            </button>
+                        </Link>
+                        }
+                        <Link to='/contact'>
                         <button className="px-8 py-4 bg-transparent hover:bg-blue-700 text-white font-medium rounded-lg border border-white transition-all">
                             Contact Support
                         </button>
+                        </Link>
                     </div>
                 </div>
             </section>

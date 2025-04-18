@@ -57,6 +57,13 @@ export const withdrawApi = createApi({
                 body: withdrawRequest,
             }),
         }),
+        approvalWithdraw: builder.mutation<ApiResponseType, string>({
+            query: (id) => ({
+                url: `/approval`,
+                method: 'PUT',
+                body: { id:id }
+            })
+        }),
 
         histroyRequest: builder.query<HistoryType,string>({
             query: (userId) => ({
@@ -75,4 +82,4 @@ export const withdrawApi = createApi({
     }),
 });
 
-export const { useWithdrawQuery,useRequestWithdrawalMutation,useHistroyRequestQuery, useAllHistoryQuery,useCancelWithdrawMutation} = withdrawApi;
+export const { useWithdrawQuery,useRequestWithdrawalMutation,useHistroyRequestQuery, useAllHistoryQuery,useCancelWithdrawMutation,useApprovalWithdrawMutation} = withdrawApi;

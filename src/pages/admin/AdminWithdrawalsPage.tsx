@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import {
     useCancelWithdrawMutation,
-    useAllHistoryQuery
+    useAllHistoryQuery,
+    useApprovalWithdrawMutation
 } from '../../slice/withdraw';
 import {
     FiRefreshCw,
@@ -15,7 +16,8 @@ import {
     FiShield
 } from 'react-icons/fi';
 import { format } from 'date-fns';
-import { Transaction } from '../../types/type';
+import { ApiResponseType, Transaction } from '../../types/type';
+import { toast } from 'react-toastify';
 
 export type TransactionStatus = 'pending' | 'completed' | 'rejected';
 
@@ -31,7 +33,7 @@ const AdminWithdrawalsPage = () => {
         isLoading,
         isError,
         refetch
-    } = useAllHistoryQuery(null);
+    } = useAllHistoryQuery(null,{refetchOnFocus:true,refetchOnMountOrArgChange:true,refetchOnReconnect:true});
 
     const [cancelWithdrawal] = useCancelWithdrawMutation();
 
@@ -46,10 +48,18 @@ const AdminWithdrawalsPage = () => {
         return matchesFilter && matchesSearch;
     }) || [];
 
-    const handleApprove = (id: string) => {
+    const [withdrawApproval] = useApprovalWithdrawMutation()
+
+    const handleApprove = async(id: string) => {
         console.log(`Approving transaction ${id}`);
-        // TODO: Implement approval logic
-        alert(`Transaction ${id} approved (check console)`);
+        try {
+            const results = await withdrawApproval(id).unwrap()
+            toast.success(results.message)
+            await refetch();
+        } catch (error) {
+            const infoError = error as {data: ApiResponseType,status:number }
+            toast.error(infoError.data.message)
+        }
     };
 
     const handleReject = async (id: string) => {
@@ -57,7 +67,7 @@ const AdminWithdrawalsPage = () => {
         if (reason) {
             try {
                 await cancelWithdrawal({ id, admin: true, reason }).unwrap();
-                refetch();
+                await refetch();
             } catch (error) {
                 console.error('Failed to reject withdrawal:', error);
             }

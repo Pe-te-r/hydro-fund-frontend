@@ -2,10 +2,8 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 
 interface CartItem {
     id: string;
-    // name: string;
-    // price: number;
+    price: number;
     quantity: number;
-    // image?: string;
 }
 
 interface CartContextType {
@@ -20,24 +18,39 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [isInitialized, setIsInitialized] = useState(false);
     const [cartItems, setCartItems] = useState<CartItem[]>([]);
     const [itemCount, setItemCount] = useState(0);
 
     // Initialize cart from localStorage
     useEffect(() => {
-        const savedCart = localStorage.getItem('cart');
-        if (savedCart) {
-            const parsedCart = JSON.parse(savedCart) as CartItem[];
-            setCartItems(parsedCart);
-            updateItemCount(parsedCart);
-        }
+        const initializeCart = () => {
+            try {
+                const savedCart = localStorage.getItem('cart');
+                if (savedCart) {
+                    const parsedCart = JSON.parse(savedCart);
+                    if (Array.isArray(parsedCart)) {
+                        setCartItems(parsedCart);
+                        updateItemCount(parsedCart);
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to parse cart from localStorage', error);
+                localStorage.removeItem('cart'); // Clear corrupted data
+            }
+            setIsInitialized(true);
+        };
+
+        initializeCart();
     }, []);
 
     // Update localStorage and item count when cart changes
     useEffect(() => {
-        localStorage.setItem('cart', JSON.stringify(cartItems));
-        updateItemCount(cartItems);
-    }, [cartItems]);
+        if (isInitialized) {
+            localStorage.setItem('cart', JSON.stringify(cartItems));
+            updateItemCount(cartItems);
+        }
+    }, [cartItems, isInitialized]);
 
     const updateItemCount = (items: CartItem[]) => {
         const count = items.reduce((total, item) => total + item.quantity, 0);

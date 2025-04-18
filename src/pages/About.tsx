@@ -1,4 +1,5 @@
 import { FiTarget, FiEye, FiShield, FiUsers, FiZap, FiHeart } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
 
 export default function AboutPage() {
     return (
@@ -168,9 +169,11 @@ export default function AboutPage() {
                     <p className="text-xl mb-8 opacity-90">
                         Be part of a growing network that believes in impact-driven finance.
                     </p>
+                    <Link to='/register'>
                     <button className="px-8 py-4 bg-white hover:bg-gray-100 text-blue-600 font-medium rounded-lg shadow-lg transition-all transform hover:scale-105">
                         Get Started Today
                     </button>
+                    </Link>
                 </div>
             </section>
         </div>

@@ -163,13 +163,13 @@ export default function InvestmentProducts() {
                                     <div className="w-full bg-gray-200 rounded-full h-2">
                                         <div
                                             className="bg-green-500 h-2 rounded-full"
-                                            style={{ width: `${Math.min(100, ((parseFloat(product.totalIncome) - parseFloat(product.price)) / parseFloat(product.price) * 100).toFixed(2))}%` }}
+                                            style={{ width: `${Math.min(100, ((product.totalIncome - product.price) / product.price) * 100)}%`}}
                                         ></div>
                                     </div>
                                 </div>
 
                                 {/* Action Button */}
-                                <button onClick={() => addToCart({id:product.id})} className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
+                                <button onClick={() => addToCart({id:product.id,price:product.price})} className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
                                     Invest Now
                                 </button>
 
