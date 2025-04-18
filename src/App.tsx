@@ -19,6 +19,7 @@ import CartPage from './pages/cart';
 import TransactionHistoryPage from './pages/users/TransactionHistoryPage';
 import AdminWithdrawalsPage from './pages/admin/AdminWithdrawalsPage';
 import AdminLayout from './components/AdminLayout';
+import Footer from './components/Footer';
 
 // Define props for our route components
 interface RouteComponentProps {
@@ -110,6 +111,7 @@ function App() {
           {/* 404 catch-all - properly typed */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <Footer/>
       </div>
     </Router>
   );

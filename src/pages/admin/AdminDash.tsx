@@ -1,253 +1,276 @@
-import React from 'react';
 import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    LineElement,
-    PointElement,
-    ArcElement,
-    Title,
-    Tooltip,
-    Legend,
-} from 'chart.js';
-import { Bar, Line, Pie } from 'react-chartjs-2';
+    FiUsers,
+    FiActivity,
+    FiDollarSign,
+    FiTrendingUp,
+    FiPieChart,
+    FiDownload,
+    FiUpload,
+    FiCreditCard,
+    FiAward,
+    FiBarChart2,
+    FiClock
+} from 'react-icons/fi';
+import { useGetAdminDashboardQuery } from '../../slice/dashboard';
 
-// Register ChartJS components
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    LineElement,
-    PointElement,
-    ArcElement,
-    Title,
-    Tooltip,
-    Legend
-);
+const AdminDashboard = () => {
+    const { data, error, isLoading } = useGetAdminDashboardQuery(undefined,{refetchOnFocus:true,refetchOnReconnect:true,refetchOnMountOrArgChange:true});
 
-// ========== STATIC DATA ==========
-const siteStats = {
-    totalVisits: 12450,
-    avgSessionDuration: '4m 32s',
-    bounceRate: '42%',
-    pagesPerVisit: 3.8,
-};
+    if (isLoading) return (
+        <div className="flex items-center justify-center h-screen">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+    );
 
-const trafficSources = {
-    direct: 38,
-    organic: 45,
-    referral: 12,
-    social: 5,
-};
+    if (error) return (
+        <div className="flex items-center justify-center h-screen">
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                Error loading dashboard data
+            </div>
+        </div>
+    );
 
-const conversionRates = {
-    signup: 5.2,
-    investment: 2.8,
-    kycCompletion: 68,
-};
-
-const growthMetrics = [
-    { month: 'Jan', visitors: 4200, signups: 218 },
-    { month: 'Feb', visitors: 5800, signups: 305 },
-    { month: 'Mar', visitors: 7200, signups: 412 },
-    { month: 'Apr', visitors: 8900, signups: 467 },
-    { month: 'May', visitors: 12450, signups: 647 },
-];
-
-// ========== CHARTS ==========
-const trafficChart = {
-    labels: Object.keys(trafficSources),
-    datasets: [{
-        data: Object.values(trafficSources),
-        backgroundColor: [
-            '#3B82F6', '#10B981', '#F59E0B', '#EC4899'
-        ],
-    }]
-};
-
-const conversionChart = {
-    labels: ['Signups', 'Investments', 'KYC Complete'],
-    datasets: [{
-        data: Object.values(conversionRates),
-        backgroundColor: [
-            '#6366F1', '#8B5CF6', '#A855F7'
-        ],
-    }]
-};
-
-const growthChart = {
-    labels: growthMetrics.map(m => m.month),
-    datasets: [
-        {
-            label: 'Visitors',
-            data: growthMetrics.map(m => m.visitors),
-            borderColor: '#3B82F6',
-            tension: 0.3,
-        },
-        {
-            label: 'Signups',
-            data: growthMetrics.map(m => m.signups),
-            borderColor: '#10B981',
-            tension: 0.3,
-        }
-    ]
-};
-
-// ========== COMPONENT ==========
-const AdminAnalyticsDashboard = () => {
     return (
-        <div className="p-6 bg-gray-50 min-h-screen">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6">HydroFund - Site Analytics</h1>
+        <div className="min-h-screen bg-gray-50 p-4 md:p-6 overflow-x-hidden">
+            <header className="mb-6">
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Admin Dashboard</h1>
+                <p className="text-gray-600 text-sm md:text-base">Overview of platform statistics and activities</p>
+            </header>
 
-            {/* Key Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-                <MetricCard
-                    title="Total Visits"
-                    value={siteStats.totalVisits.toLocaleString()}
-                    change="↑ 24%"
-                    icon="👥"
-                />
-                <MetricCard
-                    title="Avg. Session"
-                    value={siteStats.avgSessionDuration}
-                    change="↑ 18%"
-                    icon="⏱️"
-                />
-                <MetricCard
-                    title="Bounce Rate"
-                    value={siteStats.bounceRate}
-                    change="↓ 6%"
-                    icon="↩️"
-                />
-                <MetricCard
-                    title="Pages/Visit"
-                    value={siteStats.pagesPerVisit}
-                    change="↑ 12%"
-                    icon="📄"
-                />
-            </div>
-
-            {/* Growth Trends */}
-            <div className="bg-white p-4 rounded-lg shadow mb-8">
-                <h3 className="text-lg font-semibold mb-4">Visitor Growth</h3>
-                <Line
-                    data={growthChart}
-                    options={{ responsive: true }}
-                    height={300}
-                />
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                {/* Traffic Sources */}
-                <div className="bg-white p-4 rounded-lg shadow">
-                    <h3 className="text-lg font-semibold mb-4">Traffic Sources</h3>
-                    <div className="h-64">
-                        <Pie
-                            data={trafficChart}
-                            options={{ maintainAspectRatio: false }}
+            {data && (
+                <div className="flex flex-col gap-6">
+                    {/* Summary Cards - Stack vertically on mobile */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <SummaryCard
+                            title="Total Users"
+                            value={data.data.totals.users}
+                            secondaryValue={`${data.data.totals.activeUsers} active`}
+                            icon={<FiUsers className="text-blue-600 text-xl" />}
+                            bgColor="bg-blue-100"
                         />
-                    </div>
-                    <div className="mt-4 grid grid-cols-2 gap-2">
-                        {Object.entries(trafficSources).map(([source, percent]) => (
-                            <div key={source} className="flex items-center">
-                                <div
-                                    className="w-3 h-3 rounded-full mr-2"
-                                    style={{
-                                        backgroundColor: trafficChart.datasets[0].backgroundColor[
-                                            trafficChart.labels.indexOf(source)
-                                        ]
-                                    }}
-                                />
-                                <span className="capitalize">{source}</span>
-                                <span className="ml-auto font-medium">{percent}%</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
 
-                {/* Conversion Funnel */}
-                <div className="bg-white p-4 rounded-lg shadow">
-                    <h3 className="text-lg font-semibold mb-4">Conversion Rates</h3>
-                    <div className="h-64">
-                        <Bar
-                            data={conversionChart}
-                            options={{
-                                maintainAspectRatio: false,
-                                scales: { y: { beginAtZero: true, max: 100 } }
-                            }}
-                        />
-                    </div>
-                    <div className="mt-4 space-y-2">
-                        {Object.entries(conversionRates).map(([stage, rate]) => (
-                            <div key={stage} className="flex items-center">
-                                <div className="w-24 capitalize">{stage.replace(/([A-Z])/g, ' $1')}:</div>
-                                <div className="flex-1 bg-gray-200 rounded-full h-2.5">
-                                    <div
-                                        className="bg-blue-600 h-2.5 rounded-full"
-                                        style={{ width: `${rate}%` }}
-                                    />
+                        <SummaryCard
+                            title="System Balance"
+                            value={`KES ${parseFloat(data.data.totals.systemBalance).toFixed(2)}`}
+                            secondaryValue={
+                                <div className="flex flex-col space-y-1">
+                                    <span className="flex items-center">
+                                        <FiUpload className="mr-1" />KES {parseFloat(data.data.totals.totalDeposited).toFixed(2)}
+                                    </span>
+                                    <span className="flex items-center">
+                                        <FiDownload className="mr-1" />KES {parseFloat(data.data.totals.totalWithdrawn).toFixed(2)}
+                                    </span>
                                 </div>
-                                <span className="ml-2 w-12 font-medium">{rate}%</span>
+                            }
+                            icon={<FiDollarSign className="text-green-600 text-xl" />}
+                            bgColor="bg-green-100"
+                        />
+
+                        <SummaryCard
+                            title="Investments"
+                            value={`KES ${parseFloat(data.data.totals.totalInvested).toFixed(2)}`}
+                            secondaryValue={
+                                <div className="flex flex-col space-y-1">
+                                    <span className="text-green-500">{data.data.totals.activeInvestments} active</span>
+                                    <span className="text-blue-500">{data.data.totals.completedInvestments} completed</span>
+                                </div>
+                            }
+                            icon={<FiTrendingUp className="text-purple-600 text-xl" />}
+                            bgColor="bg-purple-100"
+                        />
+
+                        <SummaryCard
+                            title="Total Fees"
+                            value={`KES ${parseFloat(data.data.totals.totalFees).toFixed(2)}`}
+                            secondaryValue={`From ${data.data.distributions.withdrawals.reduce((acc, curr) => acc + parseInt(curr.count), 0)} withdrawals`}
+                            icon={<FiCreditCard className="text-amber-600 text-xl" />}
+                            bgColor="bg-amber-100"
+                        />
+                    </div>
+
+                    {/* Middle Section - Stack vertically on mobile */}
+                    <div className="flex flex-col gap-6">
+                        {/* VIP Distribution */}
+                        <div className="bg-white rounded-xl shadow-md p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-lg font-semibold text-gray-800 flex items-center">
+                                    <FiAward className="mr-2 text-blue-500" /> VIP Distribution
+                                </h2>
+                                <span className="text-sm text-gray-500">Total: {data.data.totals.users}</span>
                             </div>
-                        ))}
+                            <div className="space-y-3">
+                                {data.data.distributions.vip.map((vip) => (
+                                    <div key={vip.tier} className="mb-2">
+                                        <div className="flex justify-between text-sm mb-1">
+                                            <span className="capitalize">{vip.tier}</span>
+                                            <span>{vip.count} ({Math.round((parseInt(vip.count) / parseInt(data.data.totals.users)) * 100)}%)</span>
+                                        </div>
+                                        <div className="w-full bg-gray-200 rounded-full h-2">
+                                            <div
+                                                className="bg-blue-500 h-2 rounded-full"
+                                                style={{ width: `${(parseInt(vip.count) / parseInt(data.data.totals.users)) * 100}%` }}
+                                            ></div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Withdrawal Status */}
+                        <div className="bg-white rounded-xl shadow-md p-6">
+                            <div className="flex items-center justify-between mb-4">
+                                <h2 className="text-lg font-semibold text-gray-800 flex items-center">
+                                    <FiBarChart2 className="mr-2 text-green-500" /> Withdrawal Status
+                                </h2>
+                                <span className="text-sm text-gray-500">Total: {data.data.distributions.withdrawals.reduce((acc, curr) => acc + parseInt(curr.count), 0)}</span>
+                            </div>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                {data.data.distributions.withdrawals.map((item) => (
+                                    <div key={item.status} className="bg-gray-50 p-3 rounded-lg">
+                                        <div className="text-sm text-gray-500 capitalize">{item.status}</div>
+                                        <div className="flex items-end justify-between">
+                                            <div className="text-xl font-bold">{item.count}</div>
+                                            <div className="text-sm">KES {parseFloat(item.totalAmount).toFixed(2)}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Recent Activity */}
+                    <div className="bg-white rounded-xl shadow-md p-6">
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-lg font-semibold text-gray-800 flex items-center">
+                                <FiClock className="mr-2 text-purple-500" /> Recent Withdrawals
+                            </h2>
+                            <button className="text-sm text-blue-500 hover:text-blue-700">View All</button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {data.data.recentActivity.withdrawals.map((withdrawal) => (
+                                <div key={withdrawal.id} className="bg-gray-50 p-4 rounded-lg">
+                                    <div className="flex items-start">
+                                        <div className={`p-2 rounded-lg mr-3 ${withdrawal.status === 'completed' ? 'bg-green-100 text-green-600' :
+                                                withdrawal.status === 'pending' ? 'bg-amber-100 text-amber-600' :
+                                                    'bg-red-100 text-red-600'
+                                            }`}>
+                                            <FiDownload />
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="flex justify-between">
+                                                <span className="font-medium">KES {parseFloat(withdrawal.amount).toFixed(2)}</span>
+                                                <span className={`text-xs px-2 py-1 rounded-full ${withdrawal.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                                        withdrawal.status === 'pending' ? 'bg-amber-100 text-amber-800' :
+                                                            'bg-red-100 text-red-800'
+                                                    }`}>
+                                                    {withdrawal.status}
+                                                </span>
+                                            </div>
+                                            <div className="text-sm text-gray-500">
+                                                {new Date(withdrawal.createdAt).toLocaleString()}
+                                            </div>
+                                            {withdrawal.admin_info && (
+                                                <div className="text-xs text-gray-500 mt-1">
+                                                    Note: {withdrawal.admin_info}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Detailed Stats */}
+                    <div className="bg-white rounded-xl shadow-md p-6">
+                        <h2 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                            <FiPieChart className="mr-2 text-amber-500" /> Detailed Statistics
+                        </h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <StatCard
+                                title="Deposit Ratio"
+                                value={`${(parseFloat(data.data.totals.totalDeposited) / (parseFloat(data.data.totals.totalDeposited) + parseFloat(data.data.totals.totalWithdrawn)) * 100).toFixed(1)}%`}
+                                change="+2.5%"
+                                icon={<FiDownload className="text-blue-500" />}
+                            />
+                            <StatCard
+                                title="Withdrawal Ratio"
+                                value={`${(parseFloat(data.data.totals.totalWithdrawn) / (parseFloat(data.data.totals.totalDeposited) + parseFloat(data.data.totals.totalWithdrawn)) * 100).toFixed(1)}%`}
+                                change="-1.2%"
+                                icon={<FiUpload className="text-green-500" />}
+                            />
+                            <StatCard
+                                title="Fee Percentage"
+                                value={`${(parseFloat(data.data.totals.totalFees) / parseFloat(data.data.totals.totalWithdrawn) * 100).toFixed(1)}%`}
+                                change="+0.3%"
+                                icon={<FiCreditCard className="text-purple-500" />}
+                            />
+                            <StatCard
+                                title="Active Users"
+                                value={`${(parseInt(data.data.totals.activeUsers) / parseInt(data.data.totals.users) * 100).toFixed(1)}%`}
+                                change="+5.8%"
+                                icon={<FiActivity className="text-amber-500" />}
+                            />
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
+        </div>
+    );
+};
 
-            {/* Page Performance */}
-            <div className="bg-white p-4 rounded-lg shadow">
-                <h3 className="text-lg font-semibold mb-4">Top Performing Pages</h3>
-                <div className="overflow-x-auto">
-                    <table className="min-w-full">
-                        <thead>
-                            <tr className="border-b">
-                                <th className="text-left p-3">Page</th>
-                                <th className="text-left p-3">Visits</th>
-                                <th className="text-left p-3">Avg. Time</th>
-                                <th className="text-left p-3">Exit Rate</th>
-                                <th className="text-left p-3">Conversion</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {[
-                                { page: '/invest', visits: 5840, time: '3m45s', exit: '38%', conversion: '4.2%' },
-                                { page: '/projects', visits: 4920, time: '2m50s', exit: '45%', conversion: '3.1%' },
-                                { page: '/about', visits: 3210, time: '1m20s', exit: '62%', conversion: '1.8%' },
-                            ].map((row, i) => (
-                                <tr key={i} className="border-b hover:bg-gray-50">
-                                    <td className="p-3">{row.page}</td>
-                                    <td className="p-3">{row.visits.toLocaleString()}</td>
-                                    <td className="p-3">{row.time}</td>
-                                    <td className="p-3">{row.exit}</td>
-                                    <td className="p-3">
-                                        <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
-                                            {row.conversion}
-                                        </span>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+// Reusable Summary Card Component
+const SummaryCard = ({
+    title,
+    value,
+    secondaryValue,
+    icon,
+    bgColor = 'bg-gray-100'
+}: {
+    title: string;
+    value: string | number;
+    secondaryValue: React.ReactNode;
+    icon: React.ReactNode;
+    bgColor?: string;
+}) => {
+    return (
+        <div className="bg-white rounded-xl shadow-md p-4">
+            <div className="flex items-start">
+                <div className={`${bgColor} p-2 rounded-lg mr-3`}>
+                    {icon}
+                </div>
+                <div className="flex-1">
+                    <h3 className="text-gray-500 text-sm font-medium">{title}</h3>
+                    <p className="text-xl font-bold text-gray-800">{value}</p>
+                    <div className="text-xs text-gray-500 mt-1">
+                        {secondaryValue}
+                    </div>
                 </div>
             </div>
         </div>
     );
 };
 
-// Reusable metric card component
-const MetricCard = ({ title, value, change, icon }: any) => (
-    <div className="bg-white p-4 rounded-lg shadow">
-        <div className="flex justify-between">
-            <h3 className="text-gray-500">{title}</h3>
-            <span className="text-xl">{icon}</span>
-        </div>
-        <p className="text-2xl font-bold mt-2">{value}</p>
-        <p className={`mt-1 text-sm ${change.includes('↑') ? 'text-green-500' : 'text-red-500'
-            }`}>
-            {change} vs last period
-        </p>
-    </div>
-);
+// Reusable Stat Card Component
+const StatCard = ({ title, value, change, icon }: { title: string; value: string; change: string; icon: React.ReactNode }) => {
+    const isPositive = change.startsWith('+');
 
-export default AdminAnalyticsDashboard;
+    return (
+        <div className="bg-gray-50 p-3 rounded-lg">
+            <div className="flex justify-between items-start">
+                <div>
+                    <div className="text-sm text-gray-500">{title}</div>
+                    <div className="text-lg font-bold mt-1">{value}</div>
+                </div>
+                <div className="bg-white p-1 rounded-lg shadow-sm">
+                    {icon}
+                </div>
+            </div>
+            <div className={`text-xs mt-2 ${isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                {change} from last week
+            </div>
+        </div>
+    );
+};
+
+export default AdminDashboard;

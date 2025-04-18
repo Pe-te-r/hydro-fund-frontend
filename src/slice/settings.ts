@@ -5,6 +5,7 @@ const ApiUrl = 'http://localhost:3000/settings';
 
 // Type definitions
 export interface UserSettings {
+    id: string;
     email: string;
     username: string;
     phone: string;
@@ -77,12 +78,13 @@ export const settingsApi = createApi({
         // Update two-factor authentication status
         updateTwoFactorAuth: builder.mutation<UpdateSettingsResponse, {
             id: string;
-            code: string;
+            twoFactorSecretCode: string;
+            twoFactorEnabled?:boolean
         }>({
-            query: ({ id, code }) => ({
+            query: ({ id, twoFactorSecretCode, twoFactorEnabled }) => ({
                 url: `/${id}`,
                 method: 'PATCH',
-                body: { code },
+                body: { twoFactorSecretCode, twoFactorEnabled },
             }),
             invalidatesTags: ['Settings'],
         }),

@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react';
 import { FiEdit, FiSave, FiEye, FiEyeOff, FiCopy, FiCheck, FiX } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import QRCode from 'react-qr-code';
-import { UserSettings, useSettingsInfoQuery } from '../../slice/settings';
+import { UserSettings, useSettingsInfoQuery, useUpdateSettingsMutation, useUpdateTwoFactorAuthMutation } from '../../slice/settings';
 import { useAuth } from '../../context/AuthContext';
 import { CodeVerification } from '../../context/CodeVerification';
 
 interface ProfileData {
+    id: string;
     email: string;
     username: string;
     phone: string;
@@ -27,12 +28,16 @@ interface ShowPasswordFields {
 const SettingsPage = () => {
     const { user } = useAuth();
     const { data: settingsData, isLoading, isError, refetch } = useSettingsInfoQuery(user?.id || '');
+    const [updateUser] = useUpdateSettingsMutation()
+    const [send2Fa] = useUpdateTwoFactorAuthMutation()
+
 
     const [userData, setUserData] = useState<UserSettings | undefined>(settingsData?.data);
 
     // Profile state
     const [isEditingProfile, setIsEditingProfile] = useState<boolean>(false);
     const [profileData, setProfileData] = useState<ProfileData>({
+        id:settingsData?.data.id || '',
         email: '',
         username: '',
         phone: ''
@@ -72,6 +77,7 @@ const SettingsPage = () => {
     useEffect(() => {
         if (userData) {
             setProfileData({
+                id:userData.id,
                 email: userData.email,
                 username: userData.username,
                 phone: userData.phone
@@ -113,6 +119,7 @@ const SettingsPage = () => {
         setIsEditingProfile(false);
         setProfileCodeVerified(false);
         setProfileData({
+            id:userData.id,
             email: userData.email,
             username: userData.username,
             phone: userData.phone
@@ -122,25 +129,18 @@ const SettingsPage = () => {
     const handleProfileVerify = (): void => {
         setShowProfileCodeVerification(true);
     };
-
+    
     const handleProfileUpdate = async (): Promise<void> => {
         try {
             // In a real app, you would call your API here to update the profile
-            console.log('Profile update data:', profileData);
+            const info = await updateUser(profileData).unwrap()
 
             // Refetch to get the latest data from the database
-            const { data } = await refetch();
+            // const { data } = await refetch();
+            await refetch()
 
-            if (data?.data) {
-                console.log('Latest profile data from DB:', {
-                    email: data.data.email,
-                    username: data.data.username,
-                    phone: data.data.phone
-                });
-                setUserData(data?.data)
-            }
+            toast.success(info.message)
 
-            toast.success('Profile changes verified (check console for latest data)');
             setIsEditingProfile(false);
             setProfileCodeVerified(false);
         } catch (error) {
@@ -171,23 +171,36 @@ const SettingsPage = () => {
         setShowPasswordCodeVerification(true);
     };
 
-    const handlePasswordUpdate = (): void => {
+    const handlePasswordUpdate = async(): Promise<void> => {
         console.log('Password update data:', {
             old: passwordData.old,
             new: passwordData.new
         });
-        toast.success('Password changes verified (check console)');
-        setIsEditingPassword(false);
-        setPasswordCodeVerified(false);
-        setPasswordData({ old: '', new: '', confirm: '' });
+        try {
+            const info =await updateUser({password:{new:passwordData.new,old:passwordData.old},id:profileData.id})
+            toast.success(info.data?.message);
+            setIsEditingPassword(false);
+            setPasswordCodeVerified(false);
+            setPasswordData({ old: '', new: '', confirm: '' });
+        } catch (error) {
+            console.log(error)
+            toast.error('Password not updated')
+
+        }
     };
 
     const handle2FAVerify = (): void => {
         setShow2FACodeVerification(true);
     };
 
-    const handle2FAToggle = (): void => {
+    const handle2FAToggle = async(): Promise<void> => {
         if (userData.twoFactorEnabled) {
+
+            const info = await send2Fa({
+                id: profileData.id, twoFactorEnabled: false,
+                twoFactorSecretCode: ''
+            }).unwrap()
+            console.log(info)
             console.log('Disabling 2FA');
             toast.success('Two-factor authentication disabled');
         } else {
@@ -195,25 +208,21 @@ const SettingsPage = () => {
         }
     };
 
+
     const handle2FAUpdate = async (): Promise<void> => {
         try {
             console.log('2FA verification code:', faValue);
-
-            // In a real app, you would call your API here to verify 2FA
-            // For now, we'll just refetch to simulate getting updated data
-            const { data } = await refetch();
-
-            if (data?.data) {
-                console.log('Latest 2FA status from DB:', {
-                    twoFactorEnabled: data.data.twoFactorEnabled,
-                    twoFactorSecret: data.data.twoFactorSecret
-                });
+            const info = await send2Fa({ id: profileData.id, twoFactorSecretCode: faValue }).unwrap()
+            console.log(info)
+            toast.success( info.message)
+            
+            if (info.success===true) {
+                await refetch();
+                setShow2FASetup(false);
+                setFaValue('');
+                setTwoFACodeVerified(false);
             }
 
-            toast.success('2FA verified (check console for latest data)');
-            setShow2FASetup(false);
-            setFaValue('');
-            setTwoFACodeVerified(false);
         } catch (error) {
             console.log(error)
             toast.error('Failed to verify 2FA code');
@@ -256,14 +265,14 @@ const SettingsPage = () => {
                     {!isEditingProfile ? (
                         <button
                             onClick={handleProfileEdit}
-                            className="flex items-center text-blue-600 hover:text-blue-800"
+                            className="flex cursor-pointer items-center text-blue-600 hover:text-blue-800"
                         >
                             <FiEdit className="mr-1" /> Edit
                         </button>
                     ) : (
                         <button
                             onClick={handleProfileCancel}
-                            className="flex items-center text-gray-600 hover:text-gray-800"
+                                className="flex cursor-pointer items-center text-gray-600 hover:text-gray-800"
                         >
                             <FiX className="mr-1" /> Cancel
                         </button>
@@ -278,7 +287,7 @@ const SettingsPage = () => {
                                 type="email"
                                 value={profileData.email}
                                 onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
+                                className="mt-1  block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
                                 disabled
                             />
                         ) : (
@@ -319,14 +328,14 @@ const SettingsPage = () => {
                             {profileCodeVerified ? (
                                 <button
                                     onClick={handleProfileUpdate}
-                                    className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                                    className="flex cursor-pointer items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
                                 >
                                     <FiSave className="mr-1" /> Verify Changes
                                 </button>
                             ) : (
                                 <button
                                     onClick={handleProfileVerify}
-                                    className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                                    className="flex cursor-pointer items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                                 >
                                     <FiCheck className="mr-1" /> Verify Changes
                                 </button>
@@ -347,7 +356,7 @@ const SettingsPage = () => {
                         {!isEditingPassword && canEditPassword() && (
                             <button
                                 onClick={handlePasswordEdit}
-                                className="flex items-center text-blue-600 hover:text-blue-800"
+                                className="flex items-center cursor-pointer text-blue-600 hover:text-blue-800"
                             >
                                 <FiEdit className="mr-1" /> Change Password
                             </button>
@@ -355,7 +364,7 @@ const SettingsPage = () => {
                         {isEditingPassword && (
                             <button
                                 onClick={handlePasswordCancel}
-                                className="flex items-center text-gray-600 hover:text-gray-800"
+                                className="flex items-center cursor-pointer text-gray-600 hover:text-gray-800"
                             >
                                 <FiX className="mr-1" /> Cancel
                             </button>
@@ -375,7 +384,7 @@ const SettingsPage = () => {
                                     />
                                     <button
                                         type="button"
-                                        className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                        className="absolute cursor-pointer inset-y-0 right-0 pr-3 flex items-center"
                                         onClick={() => setShowPasswordFields({ ...showPasswordFields, old: !showPasswordFields.old })}
                                     >
                                         {showPasswordFields.old ? <FiEyeOff /> : <FiEye />}
@@ -394,7 +403,7 @@ const SettingsPage = () => {
                                     />
                                     <button
                                         type="button"
-                                        className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                        className="absolute cursor-pointer inset-y-0 right-0 pr-3 flex items-center"
                                         onClick={() => setShowPasswordFields({ ...showPasswordFields, new: !showPasswordFields.new })}
                                     >
                                         {showPasswordFields.new ? <FiEyeOff /> : <FiEye />}
@@ -414,7 +423,7 @@ const SettingsPage = () => {
                                     />
                                     <button
                                         type="button"
-                                        className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                        className="absolute cursor-pointer inset-y-0 right-0 pr-3 flex items-center"
                                         onClick={() => setShowPasswordFields({ ...showPasswordFields, confirm: !showPasswordFields.confirm })}
                                     >
                                         {showPasswordFields.confirm ? <FiEyeOff /> : <FiEye />}
@@ -436,7 +445,7 @@ const SettingsPage = () => {
                                 ) : (
                                     <button
                                         onClick={handlePasswordVerify}
-                                        className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                                        className="flex cursor-pointer items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                                     >
                                         <FiCheck className="mr-1" /> Verify Password Change
                                     </button>
@@ -465,7 +474,7 @@ const SettingsPage = () => {
                         <h3 className="text-lg font-medium">Two-Factor Authentication</h3>
                         <button
                             onClick={!userData.twoFactorEnabled ? handle2FAToggle : handle2FAVerify}
-                            className={`px-4 py-2 rounded-md ${userData.twoFactorEnabled
+                            className={`px-4 py-2 cursor-pointer rounded-md ${userData.twoFactorEnabled
                                 ? 'bg-red-100 text-red-800 hover:bg-red-200'
                                 : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
                                 }`}
@@ -500,7 +509,7 @@ const SettingsPage = () => {
                                         </code>
                                         <button
                                             onClick={() => copyToClipboard(userData.twoFactorSecret || '')}
-                                            className="text-blue-600 hover:text-blue-800 flex items-center"
+                                            className="text-blue-600 cursor-pointer hover:text-blue-800 flex items-center"
                                         >
                                             <FiCopy className="mr-1" /> Copy
                                         </button>
@@ -519,7 +528,7 @@ const SettingsPage = () => {
                                     <div className="mt-4">
                                         <button
                                             onClick={twoFACodeVerified ? handle2FAUpdate : handle2FAVerify}
-                                            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                                            className="flex cursor-pointer items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                                         >
                                             {twoFACodeVerified ? 'Submit'
                                                 :
