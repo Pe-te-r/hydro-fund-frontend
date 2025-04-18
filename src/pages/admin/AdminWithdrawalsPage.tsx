@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import {
-    useHistroyRequestQuery,
     useCancelWithdrawMutation,
     useAllHistoryQuery
 } from '../../slice/withdraw';
@@ -16,24 +15,31 @@ import {
     FiShield
 } from 'react-icons/fi';
 import { format } from 'date-fns';
+import { Transaction } from '../../types/type';
+
+export type TransactionStatus = 'pending' | 'completed' | 'rejected';
+
+
+
+type TransactionFilter = 'all' | 'pending' | 'completed' | 'rejected';
 
 const AdminWithdrawalsPage = () => {
-    const [filter, setFilter] = useState<'all' | 'pending' | 'completed' | 'rejected'>('pending');
+    const [filter, setFilter] = useState<TransactionFilter>('pending');
     const [searchTerm, setSearchTerm] = useState('');
     const {
         data,
         isLoading,
         isError,
         refetch
-    } = useAllHistoryQuery();
+    } = useAllHistoryQuery(null);
 
     const [cancelWithdrawal] = useCancelWithdrawMutation();
 
     // Filter transactions based on selected filter and search term
-    const filteredTransactions = data?.data?.filter(transaction => {
+    const filteredTransactions = (data?.data as Transaction[] | undefined)?.filter((transaction: Transaction) => {
         const matchesFilter = filter === 'all' || transaction.status === filter;
         const matchesSearch = searchTerm === '' ||
-            transaction.user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            transaction.user?.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
             transaction.phone.includes(searchTerm) ||
             transaction.id.toLowerCase().includes(searchTerm.toLowerCase());
 
@@ -50,7 +56,7 @@ const AdminWithdrawalsPage = () => {
         const reason = prompt('Please enter rejection reason:');
         if (reason) {
             try {
-                await cancelWithdrawal({ id, admin: true,reason }).unwrap();
+                await cancelWithdrawal({ id, admin: true, reason }).unwrap();
                 refetch();
             } catch (error) {
                 console.error('Failed to reject withdrawal:', error);
@@ -58,7 +64,18 @@ const AdminWithdrawalsPage = () => {
         }
     };
 
-    console.log(data)
+    const completedTransactions = (data?.data as Transaction[] | undefined)?.filter(
+        (t: Transaction) => t.status === 'completed'
+    ) || [];
+
+    const totalCompletedAmount = completedTransactions.reduce(
+        (sum: number, t: Transaction) => sum + parseFloat(t.amount), 0
+    ).toFixed(2);
+
+    const totalCompletedFees = completedTransactions.reduce(
+        (sum: number, t: Transaction) => sum + parseFloat(t.fee), 0
+    ).toFixed(2);
+
     const getStatusBadge = (status: string) => {
         const baseClasses = "px-2 py-1 rounded-full text-xs font-semibold";
         switch (status) {
@@ -118,13 +135,13 @@ const AdminWithdrawalsPage = () => {
                 <div className="bg-white shadow rounded-lg p-4 mb-6">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div className="flex space-x-2 overflow-x-auto pb-2 md:pb-0">
-                            {['all', 'pending', 'completed', 'rejected'].map((f) => (
+                            {(['all', 'pending', 'completed', 'rejected'] as TransactionFilter[]).map((f) => (
                                 <button
                                     key={f}
-                                    onClick={() => setFilter(f as any)}
+                                    onClick={() => setFilter(f)}
                                     className={`px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap ${filter === f
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                         }`}
                                 >
                                     {f.charAt(0).toUpperCase() + f.slice(1)}
@@ -156,7 +173,7 @@ const AdminWithdrawalsPage = () => {
                             <div className="ml-4">
                                 <p className="text-sm font-medium text-gray-500">Total Pending</p>
                                 <p className="text-2xl font-semibold text-gray-900">
-                                    {data?.data?.filter(t => t.status === 'pending').length || 0}
+                                    {(data?.data as Transaction[] | undefined)?.filter((t: Transaction) => t.status === 'pending').length || 0}
                                 </p>
                             </div>
                         </div>
@@ -167,28 +184,9 @@ const AdminWithdrawalsPage = () => {
                                 <FiCheck className="h-6 w-6" />
                             </div>
                             <div className="ml-4">
-                                <p className="text-sm font-medium text-gray-500">Completed Today</p>
+                                <p className="text-sm font-medium text-gray-500">Completed Amount</p>
                                 <p className="text-2xl font-semibold text-gray-900">
-                                    {data?.data?.filter(t =>
-                                        t.status === 'completed' &&
-                                        new Date(t.createdAt).toDateString() === new Date().toDateString()
-                                    ).length || 0}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="bg-white shadow rounded-lg p-4">
-                        <div className="flex items-center">
-                            <div className="p-3 rounded-full bg-red-100 text-red-600">
-                                <FiX className="h-6 w-6" />
-                            </div>
-                            <div className="ml-4">
-                                <p className="text-sm font-medium text-gray-500">Rejected Today</p>
-                                <p className="text-2xl font-semibold text-gray-900">
-                                    {data?.data?.filter(t =>
-                                        t.status === 'rejected' &&
-                                        new Date(t.createdAt).toDateString() === new Date().toDateString()
-                                    ).length || 0}
+                                    ${totalCompletedAmount}
                                 </p>
                             </div>
                         </div>
@@ -199,9 +197,24 @@ const AdminWithdrawalsPage = () => {
                                 <FiShield className="h-6 w-6" />
                             </div>
                             <div className="ml-4">
-                                <p className="text-sm font-medium text-gray-500">Total Amount</p>
+                                <p className="text-sm font-medium text-gray-500">Total Fees</p>
                                 <p className="text-2xl font-semibold text-gray-900">
-                                    ${data?.data?.reduce((sum, t) => sum + parseFloat(t.amount), 0).toFixed(2) || '0.00'}
+                                    ${totalCompletedFees}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-white shadow rounded-lg p-4">
+                        <div className="flex items-center">
+                            <div className="p-3 rounded-full bg-orange-100 text-orange-600">
+                                <FiClock className="h-6 w-6" />
+                            </div>
+                            <div className="ml-4">
+                                <p className="text-sm font-medium text-gray-500">Completed Today</p>
+                                <p className="text-2xl font-semibold text-gray-900">
+                                    {completedTransactions.filter((t: Transaction) =>
+                                        new Date(t.createdAt).toDateString() === new Date().toDateString()
+                                    ).length || 0}
                                 </p>
                             </div>
                         </div>
@@ -233,7 +246,7 @@ const AdminWithdrawalsPage = () => {
                             </thead>
                             <tbody className="bg-white divide-y divide-gray-200">
                                 {filteredTransactions.length > 0 ? (
-                                    filteredTransactions.map((transaction) => (
+                                    filteredTransactions.map((transaction: Transaction) => (
                                         <tr key={transaction.id} className="hover:bg-gray-50">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center">
@@ -241,7 +254,7 @@ const AdminWithdrawalsPage = () => {
                                                         <FiUser className="h-5 w-5 text-blue-600" />
                                                     </div>
                                                     <div className="ml-4">
-                                                        <div className="text-sm font-medium text-gray-900">{transaction.user.email}</div>
+                                                        <div className="text-sm font-medium text-gray-900">{transaction.user?.email}</div>
                                                         <div className="text-sm text-gray-500">
                                                             <FiPhone className="inline mr-1" /> {transaction.phone}
                                                         </div>
