@@ -18,6 +18,7 @@ import AdminUsersPage from './pages/admin/AdminUser';
 import CartPage from './pages/cart';
 import TransactionHistoryPage from './pages/users/TransactionHistoryPage';
 import AdminWithdrawalsPage from './pages/admin/AdminWithdrawalsPage';
+import AdminLayout from './components/AdminLayout';
 
 // Define props for our route components
 interface RouteComponentProps {
@@ -88,19 +89,22 @@ function App() {
           <Route path='/transactions'
             element={user ? <TransactionHistoryPage /> : <Login/>}
           />
-
-          {/* admin urls */}
-          <Route path='/admin'
-            element={user ? <AdminDashboard /> : <Login/>}
-          />
-          <Route path='/admin/users'
-            element={user ? <AdminUsersPage /> : <Login/>}
-          />
-          <Route path='/admin/transactions'
-            element={user ? <AdminWithdrawalsPage /> : <Login/>}
-          />
           <Route path='/cart'
             element={user ? <CartPage /> : <Login/>}
+          />
+
+          {/* admin routes */}
+          <Route
+            path='/admin'
+            element={user?<AdminLayout><AdminDashboard/></AdminLayout> : <Login/>}
+          />
+          <Route
+            path="/admin/users"
+            element={user ? <AdminLayout><AdminUsersPage /></AdminLayout> : <Login />}
+          />
+          <Route
+            path="/admin/withdrawals"
+            element={user? <AdminLayout><AdminWithdrawalsPage /></AdminLayout> : <Login />}
           />
 
           {/* 404 catch-all - properly typed */}

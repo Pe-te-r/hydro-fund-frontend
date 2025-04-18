@@ -13,6 +13,7 @@ const CartPage = () => {
         clearCart
     } = useCart();
 
+    
     // Get full product details for items in cart
     const getProductDetails = (id: string) => {
         return mockProducts.find(product => product.id === id);
@@ -38,7 +39,7 @@ const CartPage = () => {
                 <div className="flex items-center justify-between mb-8">
                     <Link
                         to="/investments"
-                        className="flex items-center text-blue-600 hover:text-blue-800"
+                        className="flex cursor-pointer items-center text-blue-600 hover:text-blue-800"
                     >
                         <FiArrowLeft className="mr-2" />
                         Back to Investments
@@ -66,7 +67,6 @@ const CartPage = () => {
                         <div className="divide-y divide-gray-200">
                             {cartItems.map(item => {
                                 const product = getProductDetails(item.id);
-                                console.log(product)
                                 return (
                                     <div key={item.id} className="p-4 sm:p-6">
                                         <div className="flex flex-col sm:flex-row sm:items-center">
@@ -106,7 +106,7 @@ const CartPage = () => {
                                                 <div className="flex items-center border border-gray-300 rounded-md">
                                                     <button
                                                         onClick={() => removeFromCart(item.id)}
-                                                        className="px-3 py-1 text-gray-600 hover:bg-gray-100"
+                                                        className="px-3 py-1 text-gray-600 cursor-pointer hover:bg-gray-100"
                                                         disabled={item.quantity <= 1}
                                                     >
                                                         -
@@ -126,14 +126,14 @@ const CartPage = () => {
                                                                 });
                                                             }
                                                         }}
-                                                        className="px-3 py-1 text-gray-600 hover:bg-gray-100"
+                                                        className="px-3 cursor-pointer py-1 text-gray-600 hover:bg-gray-100"
                                                     >
                                                         +
                                                     </button>
                                                 </div>
                                                 <button
                                                     onClick={() => deleteItem(item.id)}
-                                                    className="ml-4 text-red-500 hover:text-red-700"
+                                                    className="ml-4 cursor-pointer text-red-500 hover:text-red-700"
                                                 >
                                                     <FiTrash2 className="h-5 w-5" />
                                                 </button>
@@ -172,7 +172,7 @@ const CartPage = () => {
                                 <h3 className="text-lg font-medium text-gray-900">Order Summary</h3>
                                 <button
                                     onClick={clearCart}
-                                    className="text-sm text-red-600 hover:text-red-800"
+                                        className="text-sm cursor-pointer text-red-600 hover:text-red-800"
                                 >
                                     Clear Cart
                                 </button>
@@ -203,7 +203,7 @@ const CartPage = () => {
                             </div>
                             <button
                                 onClick={handleCheckout}
-                                className="mt-6 w-full bg-blue-600 border border-transparent rounded-md py-3 px-4 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                    className="mt-6 cursor-pointer w-full bg-blue-600 border border-transparent rounded-md py-3 px-4 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                             >
                                 Proceed to Investment
                             </button>

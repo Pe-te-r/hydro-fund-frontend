@@ -1,7 +1,9 @@
 import { FiTarget, FiEye, FiShield, FiUsers, FiZap, FiHeart } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 export default function AboutPage() {
+    const {user } = useAuth()
     return (
         <div className="bg-gradient-to-b from-blue-50 to-white min-h-screen">
             {/* Hero Section */}
@@ -169,11 +171,14 @@ export default function AboutPage() {
                     <p className="text-xl mb-8 opacity-90">
                         Be part of a growing network that believes in impact-driven finance.
                     </p>
+                    {
+                        !user&&
                     <Link to='/register'>
-                    <button className="px-8 py-4 bg-white hover:bg-gray-100 text-blue-600 font-medium rounded-lg shadow-lg transition-all transform hover:scale-105">
+                                <button className="px-8 py-4 cursor-pointer bg-white hover:bg-gray-100 text-blue-600 font-medium rounded-lg shadow-lg transition-all transform hover:scale-105">
                         Get Started Today
                     </button>
                     </Link>
+                    }
                 </div>
             </section>
         </div>

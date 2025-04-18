@@ -22,14 +22,14 @@ export default function HomePage() {
                         {
                             !user&&
                         <Link to='/register'>
-                            <button className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-lg transition-all transform hover:scale-105">
+                                    <button className="px-8 cursor-pointer py-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-lg transition-all transform hover:scale-105">
                                 Get Started
                             </button>                    
                         </Link>
                         }
 
                         <Link to='/about'>
-                        <button className="px-8 py-4 bg-white hover:bg-gray-50 text-blue-600 font-medium rounded-lg shadow-md border border-blue-200 transition-all">
+                            <button className="px-8 py-4 cursor-pointer bg-white hover:bg-gray-50 text-blue-600 font-medium rounded-lg shadow-md border border-blue-200 transition-all">
                         Learn More</button>
                         </Link>
                     </div>
@@ -146,13 +146,13 @@ export default function HomePage() {
                     <div className="flex flex-col sm:flex-row justify-center gap-4">
                         {!user &&
                         <Link to='/register'>
-                            <button className="px-8 py-4 bg-white hover:bg-gray-100 text-blue-600 font-medium rounded-lg shadow-lg transition-all transform hover:scale-105">
+                                <button className="px-8 cursor-pointer py-4 bg-white hover:bg-gray-100 text-blue-600 font-medium rounded-lg shadow-lg transition-all transform hover:scale-105">
                                 Register Now
                             </button>
                         </Link>
                         }
                         <Link to='/contact'>
-                        <button className="px-8 py-4 bg-transparent hover:bg-blue-700 text-white font-medium rounded-lg border border-white transition-all">
+                            <button className="px-8 py-4 cursor-pointer bg-transparent hover:bg-blue-700 text-white font-medium rounded-lg border border-white transition-all">
                             Contact Support
                         </button>
                         </Link>
@@ -249,7 +249,7 @@ export default function HomePage() {
                                     <p className="text-gray-600 mb-4">
                                         Connect with other HydroFund users, get updates, and share experiences in our official community groups.
                                     </p>
-                                    <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md">
+                                    <button className="px-6 py-3 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md">
                                         Join Telegram Group
                                     </button>
                                 </div>
