@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { UserResponse } from '../types/type';
+import { ApiUrl } from './url';
 
-const ApiUrl = 'http://localhost:3000';
 
 // Define the user type for localStorage
 interface LocalStorageUser {

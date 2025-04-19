@@ -195,14 +195,11 @@ const SettingsPage = () => {
 
     const handle2FAToggle = async(): Promise<void> => {
         if (userData.twoFactorEnabled) {
-
-            const info = await send2Fa({
-                id: profileData.id, twoFactorEnabled: false,
-                twoFactorSecretCode: ''
-            }).unwrap()
+            const info = await send2Fa({ id: profileData.id, twoFactorSecretCode: faValue,twoFactorEnabled:false }).unwrap()
+            console.log(faValue)
             console.log(info)
             console.log('Disabling 2FA');
-            toast.success('Two-factor authentication disabled');
+            toast.success(info.message);
         } else {
             setShow2FASetup(true);
         }
@@ -212,8 +209,7 @@ const SettingsPage = () => {
     const handle2FAUpdate = async (): Promise<void> => {
         try {
             console.log('2FA verification code:', faValue);
-            const info = await send2Fa({ id: profileData.id, twoFactorSecretCode: faValue }).unwrap()
-            console.log(info)
+            const info = await send2Fa({ id: profileData.id, twoFactorSecretCode: faValue, }).unwrap()
             toast.success( info.message)
             
             if (info.success===true) {
@@ -473,7 +469,8 @@ const SettingsPage = () => {
                     <div className="flex justify-between items-center mb-4">
                         <h3 className="text-lg font-medium">Two-Factor Authentication</h3>
                         <button
-                            onClick={!userData.twoFactorEnabled ? handle2FAToggle : handle2FAVerify}
+                            // onClick={!userData.twoFactorEnabled ? handle2FAToggle : handle2FAVerify}
+                            onClick={handle2FAToggle}
                             className={`px-4 py-2 cursor-pointer rounded-md ${userData.twoFactorEnabled
                                 ? 'bg-red-100 text-red-800 hover:bg-red-200'
                                 : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
@@ -542,6 +539,52 @@ const SettingsPage = () => {
                             </div>
                         </div>
                     )}
+
+                    {/* 2FA Disable (when disabling) */}
+                    {userData.twoFactorEnabled && (
+                        <div className="bg-gray-50 p-4 rounded-md border border-gray-200 mt-4">
+                            <h4 className="font-medium text-lg mb-3 text-gray-800">Disable Two-Factor Authentication</h4>
+                            <p className="text-sm text-gray-600 mb-4">
+                                To disable two-factor authentication, please enter a verification code from your authenticator app.
+                            </p>
+
+                            <div className="mb-4">
+                                <label htmlFor="disable2fa" className="block text-sm font-medium text-gray-700 mb-1">
+                                    Enter verification code
+                                </label>
+                                <input
+                                    type="text"
+                                    value={faValue}
+                                    name="disable2fa"
+                                    onChange={(e) => setFaValue(e.target.value)}
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
+                                    placeholder="6-digit code"
+                                />
+                            </div>
+
+                            {/* <div className="flex gap-3">
+                                <button
+                                    onClick={() => setShow2FACodeVerification(false)}
+                                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={twoFACodeVerified ? handle2FAUpdate : handle2FAVerify}
+                                    className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                                >
+                                    {twoFACodeVerified ? (
+                                        'Confirm Disable'
+                                    ) : (
+                                        <>
+                                            <FiCheck size={18} /> Verify Code
+                                        </>
+                                    )}
+                                </button>
+                            </div> */}
+                        </div>
+                    )}
+
                 </div>
             </div>
 

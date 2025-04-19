@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { BonusClaimRequest, BonusClaimResponse, LocalStorageUser } from '../types/type';
+import { ApiUrl } from './url';
 
-const ApiUrl = 'http://localhost:3000/bonus';
 
 export const bonusApi = createApi({
     reducerPath: 'bonusApi',

@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import {   ApiResponseType, HistoryType, LocalStorageUser } from '../types/type';
+import { ApiUrl } from './url';
 
-const ApiUrl = 'http://localhost:3000/withdraw';
 
 interface ResponseData{
     status: string;

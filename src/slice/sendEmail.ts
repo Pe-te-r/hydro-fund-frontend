@@ -1,7 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { LocalStorageUser } from '../types/type';
-
-const EmailUrl = 'http://localhost:3000/email';
+import { ApiUrl as EmailUrl } from './url';
 
 // Response format
 interface EmailResponse {

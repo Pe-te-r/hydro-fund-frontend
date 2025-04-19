@@ -1,4 +1,5 @@
 // types.ts (additional types for the admin users)
+import { ApiUrl as AdminUserApiUrl } from '../url';
 export interface AdminUser {
     balance: string;
     email: string;
@@ -25,7 +26,6 @@ export interface LocalStorageUser{
 // adminUserApi.ts
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-const AdminUserApiUrl = 'http://localhost:3000/admin'; // Adjust the base URL as needed
 
 export const adminUserApi = createApi({
     reducerPath: 'adminUserApi',

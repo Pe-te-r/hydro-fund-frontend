@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { ApiUrl } from './url';
 
 interface DashboardResponse {
     balance: string;
@@ -64,7 +65,6 @@ interface LocalStorageUser {
     id: string;
 }
 
-const ApiUrl = 'http://localhost:3000/dashboard';
 
 export const dashboardApi = createApi({
     reducerPath: 'dashboardApi',
