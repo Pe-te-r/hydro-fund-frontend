@@ -18,7 +18,7 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext'; // Import cart context
 
 const NavBar = () => {
-    const { isLoggedIn, logout } = useAuth();
+    const { isLoggedIn, logout,user } = useAuth();
     const { itemCount } = useCart(); // Get cart item count
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isAccountDropdownOpen, setIsAccountDropdownOpen] = useState(false);
@@ -130,7 +130,9 @@ const NavBar = () => {
                                             </div>
                                             <div className="py-1">
                                                 {accountLinks.map((link) => (
-                                                    <DropdownLink key={link.to} to={link.to} icon={link.icon} text={link.text} />
+                                                    link.text == 'Dashboard' && user?.role =='admin'?
+                                                        <DropdownLink key={link.to} to='/admin' icon={link.icon} text={link.text} /> :
+                                                        <DropdownLink key={link.to} to={link.to} icon={link.icon} text={link.text} />
                                                 ))}
                                             </div>
                                             <div className="py-1">

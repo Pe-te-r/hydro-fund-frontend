@@ -108,10 +108,10 @@ const Login = () => {
             const response = await sendLogin(credentials).unwrap();
 
             console.log('Login successful:', response);
-            login({token:response.data.token,email:response.data.user.email,username:response.data.user.username,id:response.data.user.id})
+            login({token:response.data.token,email:response.data.user.email,username:response.data.user.username,id:response.data.user.id,role:response.data.user.role})
             toast.success(response.message)
-                        
-            navigate('/dashboard');
+            if(response.data.user.role==='user')navigate('/dashboard');
+            else navigate('/admin')
         } catch (err) {
             const apiError = err as { status: number; data: ErrorResponse };
             console.log(apiError)

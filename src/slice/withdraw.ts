@@ -26,7 +26,7 @@ interface WithdrawRequest{
 export const withdrawApi = createApi({
     reducerPath: 'withdrawApi',
     baseQuery: fetchBaseQuery({
-        baseUrl: ApiUrl,
+        baseUrl: `${ApiUrl}/withdraw`,
         prepareHeaders: (headers) => {
             // Safely get and parse user from localStorage
             const userString = localStorage.getItem('user');

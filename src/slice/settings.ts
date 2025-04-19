@@ -40,7 +40,7 @@ interface UpdateSettingsResponse {
 export const settingsApi = createApi({
     reducerPath: 'settingsApi',
     baseQuery: fetchBaseQuery({
-        baseUrl: ApiUrl,
+        baseUrl: `${ApiUrl}/settings`,
         prepareHeaders: (headers) => {
             const userString = localStorage.getItem('user');
             if (userString) {

@@ -69,7 +69,7 @@ interface LocalStorageUser {
 export const dashboardApi = createApi({
     reducerPath: 'dashboardApi',
     baseQuery: fetchBaseQuery({
-        baseUrl: ApiUrl,
+        baseUrl: `${ApiUrl}/dashboard`,
         prepareHeaders: (headers) => {
             const userString = localStorage.getItem('user');
             if (userString) {

@@ -38,6 +38,7 @@ export interface AuthResponse {
             username: string;
             email: string;
             phone: string;
+            role: string;
         };
         token: string;
     }

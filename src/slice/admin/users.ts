@@ -30,7 +30,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 export const adminUserApi = createApi({
     reducerPath: 'adminUserApi',
     baseQuery: fetchBaseQuery({
-        baseUrl: AdminUserApiUrl,
+        baseUrl: `${AdminUserApiUrl}/admin`,
         prepareHeaders: (headers) => {
             // Safely get and parse user from localStorage
             const userString = localStorage.getItem('user');

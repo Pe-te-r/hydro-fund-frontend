@@ -97,15 +97,15 @@ function App() {
           {/* admin routes */}
           <Route
             path='/admin'
-            element={user?<AdminLayout><AdminDashboard/></AdminLayout> : <Login/>}
+            element={user?.role == 'admin' ?<AdminLayout><AdminDashboard/></AdminLayout> : <Login/>}
           />
           <Route
             path="/admin/users"
-            element={user ? <AdminLayout><AdminUsersPage /></AdminLayout> : <Login />}
+            element={user?.role == 'admin' ? <AdminLayout><AdminUsersPage /></AdminLayout> : <Login />}
           />
           <Route
             path="/admin/withdrawals"
-            element={user? <AdminLayout><AdminWithdrawalsPage /></AdminLayout> : <Login />}
+            element={user?.role == 'admin' ? <AdminLayout><AdminWithdrawalsPage /></AdminLayout> : <Login />}
           />
 
           {/* 404 catch-all - properly typed */}
