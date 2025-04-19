@@ -20,6 +20,7 @@ import TransactionHistoryPage from './pages/users/TransactionHistoryPage';
 import AdminWithdrawalsPage from './pages/admin/AdminWithdrawalsPage';
 import AdminLayout from './components/AdminLayout';
 import Footer from './components/Footer';
+import ProtectedRoute from './components/ProtectedRoute';
 
 // Define props for our route components
 interface RouteComponentProps {
@@ -52,60 +53,120 @@ function App() {
           {/* Protected routes */}
           <Route
             path="/dashboard"
-            element={user ? <AccountDashboard /> : <Login />}
+            element={
+              <ProtectedRoute>
+                <AccountDashboard />
+              </ProtectedRoute>
+            }
           />
+
           <Route
             path="/join"
             element={user ? <AccountDashboard /> : <Register />}
           />
- 
           <Route
             path="/investments"
-            element={user ? <InvestmentProducts /> : <Login />}
+            element={
+              <ProtectedRoute>
+                <InvestmentProducts />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="/marketplace"
-            element={user ? <Marketplace /> : <Login />}
+            element={
+              <ProtectedRoute>
+                <Marketplace />
+              </ProtectedRoute>
+            }
           />
 
-          
           <Route
             path="/withdraw"
-            element={user ? <WithdrawPage /> : <Login />}
+            element={
+              <ProtectedRoute>
+                <WithdrawPage />
+              </ProtectedRoute>
+            }
           />
- 
+
           <Route
             path="/settings"
-            element={user ? <SettingsPage /> : <Login />}
+            element={
+              <ProtectedRoute>
+                <SettingsPage />
+              </ProtectedRoute>
+            }
           />
+
           <Route
             path="/account"
-            element={user ? <AccountPage /> : <Login />}
+            element={
+              <ProtectedRoute>
+                <AccountPage />
+              </ProtectedRoute>
+            }
           />
+
           <Route
             path="/deposit"
-            element={user ? <DepositPage /> : <Login />}
+            element={
+              <ProtectedRoute>
+                <DepositPage />
+              </ProtectedRoute>
+            }
           />
-          
-          <Route path='/transactions'
-            element={user ? <TransactionHistoryPage /> : <Login/>}
+
+          <Route
+            path="/transactions"
+            element={
+              <ProtectedRoute>
+                <TransactionHistoryPage />
+              </ProtectedRoute>
+            }
           />
-          <Route path='/cart'
-            element={user ? <CartPage /> : <Login/>}
+
+          <Route
+            path="/cart"
+            element={
+              <ProtectedRoute>
+                <CartPage />
+              </ProtectedRoute>
+            }
           />
+
 
           {/* admin routes */}
           <Route
-            path='/admin'
-            element={user?.role == 'admin' ?<AdminLayout><AdminDashboard/></AdminLayout> : <Login/>}
+            path="/admin"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminLayout>
+                  <AdminDashboard />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
           />
+
           <Route
             path="/admin/users"
-            element={user?.role == 'admin' ? <AdminLayout><AdminUsersPage /></AdminLayout> : <Login />}
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminLayout>
+                  <AdminUsersPage />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
           />
           <Route
             path="/admin/withdrawals"
-            element={user?.role == 'admin' ? <AdminLayout><AdminWithdrawalsPage /></AdminLayout> : <Login />}
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminLayout>
+                  <AdminWithdrawalsPage />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
           />
 
           {/* 404 catch-all - properly typed */}

@@ -218,18 +218,26 @@ const NavBar = () => {
                     {/* Conditional rendering for logged-in users */}
                     {isLoggedIn && (
                         <div className="border-t border-blue-600 pt-4 pb-3">
-                            <div className="px-4 mb-3">
+                            <div className="px-4 mb-3"> 
                                 <p className="text-white text-sm font-medium">Account</p>
                             </div>
                             <div className="space-y-1 px-2">
                                 {accountLinks.map((link) => (
+                                    link.text == 'Dashboard' && user?.role =='admin'?
                                     <MobileDropdownLink
                                         key={link.to}
-                                        to={link.to}
+                                        to='/admin'
                                         icon={link.icon}
                                         text={link.text}
                                         onClick={() => setIsMobileMenuOpen(false)}
-                                    />
+                                        /> :
+                                        <MobileDropdownLink
+                                            key={link.to}
+                                            to={link.to}
+                                            icon={link.icon}
+                                            text={link.text}
+                                            onClick={() => setIsMobileMenuOpen(false)}
+                                        />
                                 ))}
                             </div>
                         </div>

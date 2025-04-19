@@ -117,12 +117,7 @@ const CartPage = () => {
                                                             if (product) {
                                                                 addToCart({
                                                                     id: product.id,
-                                                                    // name: product.name,
                                                                     price: product.price,
-                                                                    // quantity: 1,
-                                                                    // cycle: product.cycle,
-                                                                    // dailyIncome: product.dailyIncome,
-                                                                    // totalIncome: product.totalIncome
                                                                 });
                                                             }
                                                         }}

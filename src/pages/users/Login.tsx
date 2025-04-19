@@ -7,13 +7,20 @@ import {
     FiLock,
     FiArrowRight,
 } from 'react-icons/fi';
-import {   Link, useNavigate } from 'react-router-dom';
+import {   Link, useLocation, useNavigate } from 'react-router-dom';
 import { useLoginMutation } from '../../slice/auth';
 import { toast } from 'react-toastify';
 import { ErrorResponse } from '../../types/type';
 import { useAuth } from '../../context/AuthContext';
 
 type LoginMethod = 'username' | 'email' | 'phone';
+
+interface LocationState {
+    from?: {
+        pathname: string;
+    };
+}
+
 
 const Login = () => {
     const [activeTab, setActiveTab] = useState<LoginMethod>('email');
@@ -25,6 +32,9 @@ const Login = () => {
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const location = useLocation();
+    const state = location.state as LocationState;
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -110,8 +120,10 @@ const Login = () => {
             console.log('Login successful:', response);
             login({token:response.data.token,email:response.data.user.email,username:response.data.user.username,id:response.data.user.id,role:response.data.user.role})
             toast.success(response.message)
-            if(response.data.user.role==='user')navigate('/dashboard');
-            else navigate('/admin')
+            const from = state?.from?.pathname || (response.data.user.role === 'admin' ? '/admin' : '/dashboard');
+            navigate(from, { replace: true });
+ 
+
         } catch (err) {
             const apiError = err as { status: number; data: ErrorResponse };
             console.log(apiError)
