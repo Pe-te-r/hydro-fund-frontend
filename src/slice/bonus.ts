@@ -6,7 +6,7 @@ import { ApiUrl } from './url';
 export const bonusApi = createApi({
     reducerPath: 'bonusApi',
     baseQuery: fetchBaseQuery({
-        baseUrl: ApiUrl,
+        baseUrl: `${ApiUrl}/bonus`,
         prepareHeaders: (headers) => {
             // Safely get and parse user from localStorage
             const userString = localStorage.getItem('user');

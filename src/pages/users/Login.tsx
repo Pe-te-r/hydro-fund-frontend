@@ -121,6 +121,7 @@ const Login = () => {
             login({token:response.data.token,email:response.data.user.email,username:response.data.user.username,id:response.data.user.id,role:response.data.user.role})
             toast.success(response.message)
             const from = state?.from?.pathname || (response.data.user.role === 'admin' ? '/admin' : '/dashboard');
+            console.log(from)
             navigate(from, { replace: true });
  
 

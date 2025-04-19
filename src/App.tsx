@@ -21,6 +21,7 @@ import AdminWithdrawalsPage from './pages/admin/AdminWithdrawalsPage';
 import AdminLayout from './components/AdminLayout';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
+import InvestmentPage from './pages/InvestmentPage';
 
 // Define props for our route components
 interface RouteComponentProps {
@@ -59,6 +60,12 @@ function App() {
               </ProtectedRoute>
             }
           />
+          
+          <Route 
+            path='/investments/dashboard'
+            element={
+              <ProtectedRoute> <InvestmentPage /></ProtectedRoute>
+          }/>
 
           <Route
             path="/join"

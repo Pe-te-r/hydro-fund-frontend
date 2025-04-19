@@ -34,6 +34,7 @@ const NavBar = () => {
     // Account dropdown links configuration
     const accountLinks = [
         { to: "/dashboard", icon: <FiPieChart />, text: "Dashboard" },
+        { to: "/investments/dashboard", icon: <FiPieChart />, text: "Invest History" },
         { to: "/account", icon: <FiUser />, text: "Account" },
         { to: "/transactions", icon: <FiDollarSign />, text: "History Transactions" },
         { to: "/settings", icon: <FiSettings />, text: "Settings" },

@@ -8,12 +8,14 @@ import { emailApi } from './slice/sendEmail';
 import { dashboardApi } from './slice/dashboard';
 import { adminUserApi } from './slice/admin/users';
 import { withdrawApi } from './slice/withdraw';
+import { investmentApi } from './slice/invest';
 
 export const store = configureStore({
     reducer: {
         [userApi.reducerPath]: userApi.reducer,
         [settingsApi.reducerPath]: settingsApi.reducer,
         [authApi.reducerPath]: authApi.reducer,
+        [investmentApi.reducerPath]: investmentApi.reducer,
         [emailApi.reducerPath]: emailApi.reducer,
         [bonusApi.reducerPath]:bonusApi.reducer,
         [dashboardApi.reducerPath]:dashboardApi.reducer,
@@ -21,7 +23,7 @@ export const store = configureStore({
         [withdrawApi.reducerPath]: withdrawApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(authApi.middleware, userApi.middleware, bonusApi.middleware, withdrawApi.middleware, settingsApi.middleware, adminUserApi.middleware ,emailApi.middleware,dashboardApi.middleware),
+        getDefaultMiddleware().concat(authApi.middleware, investmentApi.middleware ,userApi.middleware, bonusApi.middleware, withdrawApi.middleware, settingsApi.middleware, adminUserApi.middleware ,emailApi.middleware,dashboardApi.middleware),
 });
 
 export type AppDispatch = typeof store.dispatch;

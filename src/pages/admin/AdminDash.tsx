@@ -15,6 +15,7 @@ import { useGetAdminDashboardQuery } from '../../slice/dashboard';
 
 const AdminDashboard = () => {
     const { data, error, isLoading } = useGetAdminDashboardQuery(undefined,{refetchOnFocus:true,refetchOnReconnect:true,refetchOnMountOrArgChange:true});
+    console.log(data)
 
     if (isLoading) return (
         <div className="flex items-center justify-center h-screen">

@@ -1,7 +1,12 @@
 import { useCart } from '../context/CartContext';
 import { mockProducts } from './data';
 import { FiTrash2, FiShoppingCart, FiArrowLeft } from 'react-icons/fi';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { useEffect } from 'react';
+import { useCreateOrderMutation } from '../slice/invest';
+import { useAuth } from '../context/AuthContext';
+import { ApiErrorType } from '../types/type';
 
 const CartPage = () => {
     const {
@@ -13,24 +18,81 @@ const CartPage = () => {
         clearCart
     } = useCart();
 
-    
+    const navigate = useNavigate();
+    const [createOrder, { isLoading, isError, error, isSuccess }] = useCreateOrderMutation();
+
     // Get full product details for items in cart
     const getProductDetails = (id: string) => {
         return mockProducts.find(product => product.id === id);
     };
 
+    const checkoutItems = cartItems.map(item => {
+        const product = getProductDetails(item.id);
+        return {
+            productId: item.id,
+            productName: product?.name || 'Unknown Product',
+            price: item.price,
+            quantity: item.quantity,
+            dailyIncome: product?.dailyIncome || 0,
+            totalIncome: product?.totalIncome || 0,
+            cycle: product?.cycle || 0
+        };
+    });
+
+
     // Calculate total cost
     const totalCost = cartItems.reduce(
         (sum, item) => sum + (item.price * item.quantity), 0
     );
+    const {user}=useAuth()
 
     // Handle checkout
-    const handleCheckout = () => {
-        console.log('Checkout Items:', cartItems);
-        console.log('Total Cost:', totalCost);
-        // Here you would typically send this data to your backend
-        // clearCart(); // Uncomment if you want to clear cart after checkout
+    const handleCheckout = async () => {
+        try {
+            // Get user ID from local storage or auth context
+            const userId = user?.id
+            if (!userId) {
+                toast.error('You need to be logged in to checkout');
+                return;
+            }
+
+            const orderData = {
+                userId,
+                items: checkoutItems,
+                totalAmount: totalCost
+            };
+
+            console.log(orderData)
+            const results = await createOrder(orderData).unwrap();
+            toast.success(results.message)
+            console.log(results)
+
+        } catch (err) {
+
+            // Error handling is done in the useEffect below
+            console.error('Checkout failed:', err);
+        }
     };
+
+    // Handle API response side effects
+    useEffect(() => {
+        if (isError) {
+            const apiError = error as ApiErrorType;
+            const errorMessage = apiError?.data?.message || 'Failed to place order';
+
+            if (errorMessage.includes('insufficient balance')) {
+                toast.error('Insufficient balance in your wallet');
+            } else {
+                toast.error(errorMessage);
+            }
+        }
+
+        if (isSuccess) {
+            toast.success('Order placed successfully!');
+            clearCart();
+            navigate('/investments/active');
+        }
+    }, [isError, isSuccess, error]);
 
     return (
         <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -167,7 +229,7 @@ const CartPage = () => {
                                 <h3 className="text-lg font-medium text-gray-900">Order Summary</h3>
                                 <button
                                     onClick={clearCart}
-                                        className="text-sm cursor-pointer text-red-600 hover:text-red-800"
+                                    className="text-sm cursor-pointer text-red-600 hover:text-red-800"
                                 >
                                     Clear Cart
                                 </button>
@@ -198,9 +260,10 @@ const CartPage = () => {
                             </div>
                             <button
                                 onClick={handleCheckout}
-                                    className="mt-6 cursor-pointer w-full bg-blue-600 border border-transparent rounded-md py-3 px-4 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                disabled={isLoading}
+                                className={`mt-6 w-full bg-blue-600 border border-transparent rounded-md py-3 px-4 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 ${isLoading ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}`}
                             >
-                                Proceed to Investment
+                                {isLoading ? 'Processing...' : 'Proceed to Investment'}
                             </button>
                         </div>
                     </div>

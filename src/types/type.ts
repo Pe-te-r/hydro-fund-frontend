@@ -140,3 +140,9 @@ export interface ApiResponseType{
 }
 
 export type HistoryType = ApiResponse<Transaction>;
+
+
+export interface ApiErrorType{
+    status: number;
+    data:{status:string,message:string}
+}
