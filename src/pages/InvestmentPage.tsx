@@ -19,7 +19,8 @@ const InvestmentPage = () => {
     const { user } = useAuth();
     const userId = user?.id || '';
     const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active');
-    const { data: ordersResponse, isLoading, isError } = useGetUserOrdersQuery(userId);
+    const { data: ordersResponse, isLoading, isError } = useGetUserOrdersQuery(userId,{refetchOnFocus:true,refetchOnMountOrArgChange:true,refetchOnReconnect:true});
+    console.log(ordersResponse)
 
     const orders = useMemo(() => {
         if (!ordersResponse?.data) return [];

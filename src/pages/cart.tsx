@@ -29,7 +29,7 @@ const CartPage = () => {
     const checkoutItems = cartItems.map(item => {
         const product = getProductDetails(item.id);
         return {
-            productId: item.id,
+            productId: Number(item.id),
             productName: product?.name || 'Unknown Product',
             price: item.price,
             quantity: item.quantity,

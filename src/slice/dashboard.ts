@@ -1,5 +1,6 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
 import { ApiUrl } from './url';
+import { createAuthApi } from './baseAuth';
 
 interface DashboardResponse {
     balance: string;
@@ -89,32 +90,11 @@ interface AdminDashboardResponse {
     };
 }
 
-interface LocalStorageUser {
-    token: string;
-    email: string;
-    id: string;
-}
 
 
 export const dashboardApi = createApi({
     reducerPath: 'dashboardApi',
-    baseQuery: fetchBaseQuery({
-        baseUrl: `${ApiUrl}/dashboard`,
-        prepareHeaders: (headers) => {
-            const userString = localStorage.getItem('user');
-            if (userString) {
-                try {
-                    const user: LocalStorageUser = JSON.parse(userString);
-                    if (user?.token) {
-                        headers.set('Authorization', `Bearer ${user.token}`);
-                    }
-                } catch (error) {
-                    console.error('Failed to parse user from localStorage', error);
-                }
-            }
-            return headers;
-        },
-    }),
+    baseQuery: createAuthApi(`${ApiUrl}/dashboard`),
     endpoints: (builder) => ({
         getDashboardById: builder.query<DashboardResponse, string>({
             query: (id) => `/${id}`,

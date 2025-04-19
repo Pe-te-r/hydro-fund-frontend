@@ -1,35 +1,14 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
 import { UserResponse } from '../types/type';
 import { ApiUrl } from './url';
+import { createAuthApi } from './baseAuth';
 
 
-// Define the user type for localStorage
-interface LocalStorageUser {
-    token: string;
-    email: string;
-    id: string;
-}
+
 
 export const userApi = createApi({
     reducerPath: 'userApi',
-    baseQuery: fetchBaseQuery({
-        baseUrl: ApiUrl,
-        prepareHeaders: (headers) => {
-            // Safely get and parse user from localStorage
-            const userString = localStorage.getItem('user');
-            if (userString) {
-                try {
-                    const user: LocalStorageUser = JSON.parse(userString);
-                    if (user?.token) {
-                        headers.set('Authorization', `Bearer ${user.token}`);
-                    }
-                } catch (error) {
-                    console.error('Failed to parse user from localStorage', error);
-                }
-            }
-            return headers;
-        },
-    }),
+    baseQuery: createAuthApi(`${ApiUrl}`),
     endpoints: (builder) => ({
         getUserById: builder.query<UserResponse, string>({
             query: (id) => `/users/${id}`,

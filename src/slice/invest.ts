@@ -1,6 +1,7 @@
 // services/investmentApi.ts
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
 import { ApiUrl } from './url';
+import { createAuthApi } from './baseAuth';
 
 // Types
 interface OrderItem {
@@ -41,16 +42,7 @@ interface CreateOrderRequest {
 
 export const investmentApi = createApi({
     reducerPath: 'investmentApi',
-    baseQuery: fetchBaseQuery({
-        baseUrl: `${ApiUrl}/invest`,
-        prepareHeaders: (headers) => {
-            const token = localStorage.getItem('token');
-            if (token) {
-                headers.set('Authorization', `Bearer ${token}`);
-            }
-            return headers;
-        },
-    }),
+    baseQuery: createAuthApi(`${ApiUrl}/invest`),
     tagTypes: ['Orders'],
     endpoints: (builder) => ({
         // Create new investment order (maintained as is)

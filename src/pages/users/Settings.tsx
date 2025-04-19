@@ -27,7 +27,7 @@ interface ShowPasswordFields {
 
 const SettingsPage = () => {
     const { user } = useAuth();
-    const { data: settingsData, isLoading, isError, refetch } = useSettingsInfoQuery(user?.id || '');
+    const { data: settingsData, isLoading, isError, refetch } = useSettingsInfoQuery(user?.id || '',{refetchOnFocus:true,refetchOnReconnect:true,refetchOnMountOrArgChange:true});
     const [updateUser] = useUpdateSettingsMutation()
     const [send2Fa] = useUpdateTwoFactorAuthMutation()
 

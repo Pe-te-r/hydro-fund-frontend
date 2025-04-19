@@ -1,4 +1,5 @@
 // types.ts (additional types for the admin users)
+import { createAuthApi } from '../baseAuth';
 import { ApiUrl as AdminUserApiUrl } from '../url';
 export interface AdminUser {
     balance: string;
@@ -24,29 +25,12 @@ export interface LocalStorageUser{
 
 
 // adminUserApi.ts
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { createApi } from '@reduxjs/toolkit/query/react';
 
 
 export const adminUserApi = createApi({
     reducerPath: 'adminUserApi',
-    baseQuery: fetchBaseQuery({
-        baseUrl: `${AdminUserApiUrl}/admin`,
-        prepareHeaders: (headers) => {
-            // Safely get and parse user from localStorage
-            const userString = localStorage.getItem('user');
-            if (userString) {
-                try {
-                    const user: LocalStorageUser = JSON.parse(userString);
-                    if (user?.token) {
-                        headers.set('Authorization', `Bearer ${user.token}`);
-                    }
-                } catch (error) {
-                    console.error('Failed to parse user from localStorage', error);
-                }
-            }
-            return headers;
-        },
-    }),
+    baseQuery: createAuthApi(`${AdminUserApiUrl}/admin`),
     tagTypes: ['AdminUsers'], // For cache invalidation
     endpoints: (builder) => ({
         getAdminUsers: builder.query<AdminUsersResponse, void>({

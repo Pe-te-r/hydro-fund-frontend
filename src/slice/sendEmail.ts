@@ -1,6 +1,6 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { LocalStorageUser } from '../types/type';
+import { createApi,  } from '@reduxjs/toolkit/query/react';
 import { ApiUrl as EmailUrl } from './url';
+import { createAuthApi } from './baseAuth';
 
 // Response format
 interface EmailResponse {
@@ -16,23 +16,7 @@ interface VerifyCodeRequest {
 
 export const emailApi = createApi({
     reducerPath: 'emailApi',
-    baseQuery: fetchBaseQuery({
-        baseUrl: EmailUrl,
-        prepareHeaders: (headers) => {
-            const userString = localStorage.getItem('user');
-            if (userString) {
-                try {
-                    const user: LocalStorageUser = JSON.parse(userString);
-                    if (user?.token) {
-                        headers.set('Authorization', `Bearer ${user.token}`);
-                    }
-                } catch (error) {
-                    console.error('Failed to parse user from localStorage', error);
-                }
-            }
-            return headers;
-        },
-    }),
+    baseQuery: createAuthApi(`${EmailUrl}`),
     endpoints: (builder) => ({
         sendEmail: builder.query<EmailResponse, string>({
             query: (userId) => `/${userId}`,

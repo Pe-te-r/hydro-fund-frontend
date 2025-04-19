@@ -1,6 +1,7 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import {   ApiResponseType, HistoryType, LocalStorageUser } from '../types/type';
+import { createApi } from '@reduxjs/toolkit/query/react';
+import {   ApiResponseType, HistoryType } from '../types/type';
 import { ApiUrl } from './url';
+import { createAuthApi } from './baseAuth';
 
 
 interface ResponseData{
@@ -25,24 +26,7 @@ interface WithdrawRequest{
 
 export const withdrawApi = createApi({
     reducerPath: 'withdrawApi',
-    baseQuery: fetchBaseQuery({
-        baseUrl: `${ApiUrl}/withdraw`,
-        prepareHeaders: (headers) => {
-            // Safely get and parse user from localStorage
-            const userString = localStorage.getItem('user');
-            if (userString) {
-                try {
-                    const user: LocalStorageUser = JSON.parse(userString);
-                    if (user?.token) {
-                        headers.set('Authorization', `Bearer ${user.token}`);
-                    }
-                } catch (error) {
-                    console.error('Failed to parse user from localStorage', error);
-                }
-            }
-            return headers;
-        },
-    }),
+    baseQuery: createAuthApi(`${ApiUrl}/withdraw`),
     endpoints: (builder) => ({
         allHistory: builder.query<HistoryType,null>({
             query:() =>'/all'

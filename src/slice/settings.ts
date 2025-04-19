@@ -1,6 +1,6 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { LocalStorageUser } from '../types/type';
+import { createApi } from '@reduxjs/toolkit/query/react';
 import { ApiUrl } from './url';
+import { createAuthApi } from './baseAuth';
 
 // Type definitions
 export interface UserSettings {
@@ -39,23 +39,7 @@ interface UpdateSettingsResponse {
 
 export const settingsApi = createApi({
     reducerPath: 'settingsApi',
-    baseQuery: fetchBaseQuery({
-        baseUrl: `${ApiUrl}/settings`,
-        prepareHeaders: (headers) => {
-            const userString = localStorage.getItem('user');
-            if (userString) {
-                try {
-                    const user: LocalStorageUser = JSON.parse(userString);
-                    if (user?.token) {
-                        headers.set('Authorization', `Bearer ${user.token}`);
-                    }
-                } catch (error) {
-                    console.error('Failed to parse user from localStorage', error);
-                }
-            }
-            return headers;
-        },
-    }),
+    baseQuery: createAuthApi(`${ApiUrl}/settings`),
     tagTypes: ['Settings'], // For cache invalidation
     endpoints: (builder) => ({
         // Get user settings
