@@ -205,7 +205,7 @@ const AdminWithdrawalsPage = () => {
                                         <span className="font-medium">User:</span> {selectedTransaction?.user?.email}
                                     </p>
                                     <p className="text-sm">
-                                        <span className="font-medium">Amount:</span> ${selectedTransaction?.amount}
+                                        <span className="font-medium">Amount:</span>KES {selectedTransaction?.amount}
                                     </p>
                                     <p className="text-sm">
                                         <span className="font-medium">Date:</span> {selectedTransaction?.createdAt &&
@@ -338,7 +338,7 @@ const AdminWithdrawalsPage = () => {
                             <div className="ml-4">
                                 <p className="text-sm font-medium text-gray-500">Completed Amount</p>
                                 <p className="text-2xl font-semibold text-gray-900">
-                                    ${totalCompletedAmount}
+                                    KES {totalCompletedAmount}
                                 </p>
                             </div>
                         </div>
@@ -351,7 +351,7 @@ const AdminWithdrawalsPage = () => {
                             <div className="ml-4">
                                 <p className="text-sm font-medium text-gray-500">Total Fees</p>
                                 <p className="text-2xl font-semibold text-gray-900">
-                                    ${totalCompletedFees}
+                                    KES {totalCompletedFees}
                                 </p>
                             </div>
                         </div>
@@ -364,9 +364,11 @@ const AdminWithdrawalsPage = () => {
                             <div className="ml-4">
                                 <p className="text-sm font-medium text-gray-500">Completed Today</p>
                                 <p className="text-2xl font-semibold text-gray-900">
-                                    {completedTransactions.filter((t: Transaction) =>
-                                        new Date(t.createdAt).toDateString() === new Date().toDateString()
-                                    ).length || 0}
+                                    {(data?.data as Transaction[] | undefined)
+                                        ?.filter((t: Transaction) =>
+                                            t.status === 'completed' &&
+                                            new Date(t.createdAt).toDateString() === new Date().toDateString()
+                                        ).length || 0}
                                 </p>
                             </div>
                         </div>
@@ -415,7 +417,7 @@ const AdminWithdrawalsPage = () => {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="text-sm text-gray-900 font-medium">${transaction.amount}</div>
-                                                <div className="text-sm text-gray-500">Fee: ${transaction.fee}</div>
+                                                <div className="text-sm text-gray-500">Fee: KES {transaction.fee}</div>
                                                 <div className="text-xs text-gray-400 mt-1">ID: {transaction.id.slice(0, 8)}...</div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
