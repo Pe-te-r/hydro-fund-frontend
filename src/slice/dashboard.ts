@@ -28,8 +28,6 @@ interface AdminDashboardResponse {
             totalWithdrawn: string;
             totalFees: string;
             totalInvested: string;
-            activeInvestments: string;
-            completedInvestments: string;
         };
         distributions: {
             vip: Array<{
@@ -40,6 +38,16 @@ interface AdminDashboardResponse {
                 status: string;
                 count: string;
                 totalAmount: string;
+            }>; 
+            investments: Array<{
+                status: string;
+                count: string;
+                totalAmount: string;
+            }>;
+            referrals: Array<{
+                status: string;
+                count: string;
+                totalAmount: string;
             }>;
         };
         recentActivity: {
@@ -47,13 +55,35 @@ interface AdminDashboardResponse {
                 id: string;
                 userId: string;
                 amount: string;
-                netAmount: string;
                 fee: string;
                 phone: string;
-                admin_info: string | null;
+                admin_info: string;
                 status: string;
+                createAt: string;
+                processedAt?: string;
+                user: {
+                    phone: string;
+                    email: string;
+                }
+            }>;
+            investments: Array<{
+                id: string;
+                userId: string;
+                totalAmount: string;
+                status: string;
+                claimed: boolean;
                 createdAt: string;
-                processedAt: string | null;
+                user: {
+                    phone: string;
+                    email: string;
+                }
+                updatedAt: string;
+            }>;
+        };
+        growth: {
+            users: Array<{
+                date: string;
+                count: string;
             }>;
         };
     };

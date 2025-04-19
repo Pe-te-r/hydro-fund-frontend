@@ -102,7 +102,7 @@ const InvestmentPage = () => {
                                             }`}>
                                             {order.status === 'completed' ? 'Completed' : 'Active'}
                                         </span>
-                                        <span className="font-medium">{formatMoney(order.totalAmount)}</span>
+                                        <span className="font-medium">Cost: {formatMoney(order.totalAmount)}</span>
                                     </div>
                                 </div>
 

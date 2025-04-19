@@ -103,7 +103,6 @@ export default function AccountPage() {
     }
 
     const user = userData.data;
-    console.log(user.referredUsers)
     const showAccountBonus = user.bonus?.status === 'pending'
 
     return (

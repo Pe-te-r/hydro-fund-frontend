@@ -90,7 +90,7 @@ const CartPage = () => {
         if (isSuccess) {
             toast.success('Order placed successfully!');
             clearCart();
-            navigate('/investments/active');
+            navigate('/investments/dashboard');
         }
     }, [isError, isSuccess, error]);
 

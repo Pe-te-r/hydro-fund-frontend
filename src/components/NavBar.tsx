@@ -13,7 +13,8 @@ import {
     FiMenu,
     FiX,
     FiShoppingCart,
-    FiDollarSign
+    FiDollarSign,
+    FiBriefcase
 } from 'react-icons/fi';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext'; // Import cart context
@@ -34,8 +35,8 @@ const NavBar = () => {
     // Account dropdown links configuration
     const accountLinks = [
         { to: "/dashboard", icon: <FiPieChart />, text: "Dashboard" },
-        { to: "/investments/dashboard", icon: <FiPieChart />, text: "Invest History" },
         { to: "/account", icon: <FiUser />, text: "Account" },
+        { to: "/investments/dashboard", icon: <FiBriefcase />, text: "Invest History" },
         { to: "/transactions", icon: <FiDollarSign />, text: "History Transactions" },
         { to: "/settings", icon: <FiSettings />, text: "Settings" },
     ];

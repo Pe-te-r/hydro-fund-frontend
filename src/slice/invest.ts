@@ -56,7 +56,7 @@ export const investmentApi = createApi({
         // Create new investment order (maintained as is)
         createOrder: builder.mutation<ApiResponse<string>, CreateOrderRequest>({
             query: (orderData) => ({
-                url: '/order',
+                url: '',
                 method: 'POST',
                 body: orderData
             }),
