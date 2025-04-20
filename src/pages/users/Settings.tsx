@@ -27,7 +27,7 @@ interface ShowPasswordFields {
 
 const SettingsPage = () => {
     const { user } = useAuth();
-    const { data: settingsData, isLoading, isError, refetch } = useSettingsInfoQuery(user?.id || '',{refetchOnFocus:true,refetchOnReconnect:true,refetchOnMountOrArgChange:true});
+    const { data: settingsData, isLoading, isError, refetch } = useSettingsInfoQuery(user?.id || '', { refetchOnFocus: true, refetchOnReconnect: true, refetchOnMountOrArgChange: true });
     const [updateUser] = useUpdateSettingsMutation()
     const [send2Fa] = useUpdateTwoFactorAuthMutation()
 
@@ -37,7 +37,7 @@ const SettingsPage = () => {
     // Profile state
     const [isEditingProfile, setIsEditingProfile] = useState<boolean>(false);
     const [profileData, setProfileData] = useState<ProfileData>({
-        id:settingsData?.data.id || '',
+        id: settingsData?.data.id || '',
         email: '',
         username: '',
         phone: ''
@@ -77,7 +77,7 @@ const SettingsPage = () => {
     useEffect(() => {
         if (userData) {
             setProfileData({
-                id:userData.id,
+                id: userData.id,
                 email: userData.email,
                 username: userData.username,
                 phone: userData.phone
@@ -119,7 +119,7 @@ const SettingsPage = () => {
         setIsEditingProfile(false);
         setProfileCodeVerified(false);
         setProfileData({
-            id:userData.id,
+            id: userData.id,
             email: userData.email,
             username: userData.username,
             phone: userData.phone
@@ -129,7 +129,7 @@ const SettingsPage = () => {
     const handleProfileVerify = (): void => {
         setShowProfileCodeVerification(true);
     };
-    
+
     const handleProfileUpdate = async (): Promise<void> => {
         try {
             // In a real app, you would call your API here to update the profile
@@ -171,10 +171,10 @@ const SettingsPage = () => {
         setShowPasswordCodeVerification(true);
     };
 
-    const handlePasswordUpdate = async(): Promise<void> => {
+    const handlePasswordUpdate = async (): Promise<void> => {
 
         try {
-            const info =await updateUser({password:{new:passwordData.new,old:passwordData.old},id:profileData.id})
+            const info = await updateUser({ password: { new: passwordData.new, old: passwordData.old }, id: profileData.id })
             toast.success(info.data?.message);
             setIsEditingPassword(false);
             setPasswordCodeVerified(false);
@@ -190,9 +190,9 @@ const SettingsPage = () => {
         setShow2FACodeVerification(true);
     };
 
-    const handle2FAToggle = async(): Promise<void> => {
+    const handle2FAToggle = async (): Promise<void> => {
         if (userData.twoFactorEnabled) {
-            const info = await send2Fa({ id: profileData.id, twoFactorSecretCode: faValue,twoFactorEnabled:false }).unwrap()
+            const info = await send2Fa({ id: profileData.id, twoFactorSecretCode: faValue, twoFactorEnabled: false }).unwrap()
             toast.success(info.message);
         } else {
             setShow2FASetup(true);
@@ -205,9 +205,9 @@ const SettingsPage = () => {
         try {
             console.log('2FA verification code:', faValue);
             const info = await send2Fa({ id: profileData.id, twoFactorSecretCode: faValue, }).unwrap()
-            toast.success( info.message)
-            
-            if (info.success===true||info.success==='success') {
+            toast.success(info.message)
+
+            if (info.success === true || info.success === 'success') {
                 await refetch();
                 setShow2FASetup(false);
                 setFaValue('');
@@ -263,7 +263,7 @@ const SettingsPage = () => {
                     ) : (
                         <button
                             onClick={handleProfileCancel}
-                                className="flex cursor-pointer items-center text-gray-600 hover:text-gray-800"
+                            className="flex cursor-pointer items-center text-gray-600 hover:text-gray-800"
                         >
                             <FiX className="mr-1" /> Cancel
                         </button>
@@ -446,30 +446,30 @@ const SettingsPage = () => {
                     ) : (
                         <div>
                             <p className="text-sm text-gray-600">
-                                    Last changed: {new Date(userData.password.lastChanged).toLocaleString(undefined, {
-                                        weekday: 'short',
+                                Last changed: {new Date(userData.password.lastChanged).toLocaleString(undefined, {
+                                    weekday: 'short',
                                     year: 'numeric',
                                     month: 'long',
                                     day: 'numeric',
                                     hour: '2-digit',
                                     minute: '2-digit',
-                                            })}
+                                })}
                             </p>
                             {!canEditPassword() && (
-                                    <p className="text-sm text-yellow-600 mt-1">
-                                        You can only change your password every 3 days. Next change available on {
-                                            new Date(
-                                                new Date(userData.password.lastChanged).getTime() + 3 * 24 * 60 * 60 * 1000
-                                            ).toLocaleString(undefined, {
-                                                weekday: 'short',
-                                                year: 'numeric',
-                                                month: 'long',
-                                                day: 'numeric',
-                                                hour: '2-digit',
-                                                minute: '2-digit',
-                                            })
-                                        }
-                                    </p>
+                                <p className="text-sm text-yellow-600 mt-1">
+                                    You can only change your password every 3 days. Next change available on {
+                                        new Date(
+                                            new Date(userData.password.lastChanged).getTime() + 3 * 24 * 60 * 60 * 1000
+                                        ).toLocaleString(undefined, {
+                                            weekday: 'short',
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                        })
+                                    }
+                                </p>
 
                             )}
                         </div>
@@ -574,6 +574,26 @@ const SettingsPage = () => {
                                 />
                             </div>
 
+                            {/* <div className="flex gap-3">
+                                <button
+                                    onClick={() => setShow2FACodeVerification(false)}
+                                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={twoFACodeVerified ? handle2FAUpdate : handle2FAVerify}
+                                    className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+                                >
+                                    {twoFACodeVerified ? (
+                                        'Confirm Disable'
+                                    ) : (
+                                        <>
+                                            <FiCheck size={18} /> Verify Code
+                                        </>
+                                    )}
+                                </button>
+                            </div> */}
                         </div>
                     )}
 
