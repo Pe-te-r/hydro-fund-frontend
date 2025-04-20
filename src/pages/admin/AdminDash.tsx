@@ -28,7 +28,8 @@ const AdminDashboard = () => {
     const { data, error, isLoading, refetch } = useGetAdminDashboardQuery(undefined, {
         refetchOnFocus: true,
         refetchOnReconnect: true,
-        refetchOnMountOrArgChange: true
+        refetchOnMountOrArgChange: true,
+        pollingInterval:10000
     });
     console.log(data)
     const [activeTab, setActiveTab] = useState<'withdrawals' | 'investments'>('investments');

@@ -75,6 +75,143 @@ export interface BonusClaimResponse {
 export interface BonusClaimRequest {
     id: string;
 }
+export interface AdminUserServiceResponse {
+    userInfo: {
+        id: string;
+        username: string;
+        email: string;
+        phone: string;
+        status: string;
+        balance: string;
+        deposit: string;
+        role: string;
+        vipTier: string;
+        code: string | null;
+        totalInvested: string;
+        totalWithdrawn: string;
+        createdAt: Date | string;
+        lastLogin: Date | string | null;
+        profileComplete: boolean;
+        twoFactorEnabled: boolean;
+    };
+    security: {
+        passwordLastChanged: Date | string | null;
+        twoFactorSecret: string | null;
+    };
+    financial: {
+        bonus: {
+            userId?: string;
+            status: string;
+            bonusAmount: string;
+            createdAt?: Date | string;
+        } | null;
+        withdrawals: Array<{
+            amount: string | number;
+            netAmount: string | number;
+            fee: string | number;
+            admin_info?: string;
+            status: string;
+            createdAt: Date | string;
+            processedAt: Date | string | null;
+        }>;
+        totalWithdrawnAmount: number;
+        pendingWithdrawals: Array<{
+            amount: string | number;
+            netAmount: string | number;
+            fee: string | number;
+            admin_info?: string;
+            status: string;
+            createdAt: Date | string;
+            processedAt: Date | string | null;
+        }>;
+        completedWithdrawals: Array<{
+            amount: string | number;
+            netAmount: string | number;
+            fee: string | number;
+            admin_info?: string;
+            status: string;
+            createdAt: Date | string;
+            processedAt: Date | string | null;
+        }>;
+    };
+    investments: {
+        orders: Array<{
+            id: string;
+            totalAmount: string | number;
+            status: string;
+            claimed: boolean;
+            createdAt: Date | string;
+            items: Array<{
+                id: string;
+                orderId: string;
+                productId: number;
+                productName: string;
+                quantity: number;
+                price: string;
+                dailyIncome: string;
+                totalIncome: string;
+                cycle: number;
+                createdAt: Date | string;
+            }>;
+        }>;
+        totalInvested: number;
+        activeInvestments: Array<{
+            id: string;
+            totalAmount: string | number;
+            status: string;
+            claimed: boolean;
+            createdAt: Date | string;
+            items: Array<{
+                id: string;
+                orderId: string;
+                productId: number;
+                productName: string;
+                quantity: number;
+                price: string;
+                dailyIncome: string;
+                totalIncome: string;
+                cycle: number;
+                createdAt: Date | string;
+            }>;
+        }>;
+        completedInvestments: Array<{
+            id: string;
+            totalAmount: string | number;
+            status: string;
+            claimed: boolean;
+            createdAt: Date | string;
+            items: Array<{
+                id: string;
+                orderId: string;
+                productId: number;
+                productName: string;
+                quantity: number;
+                price: string;
+                dailyIncome: string;
+                totalIncome: string;
+                cycle: number;
+                createdAt: Date | string;
+            }>;
+        }>;
+    };
+    referrals: {
+        referredBy: Array<{
+            referrer: {
+                email: string;
+            };
+        }>;
+        referredUsers: Array<{
+            referred: {
+                email: string;
+                id: string;
+            };
+            bonusAmount: string;
+            bonusStatus: string;
+        }>;
+        totalReferrals: number;
+        potentialBonus: number;
+    };
+}
 
 export interface UserData {
     id: string;
@@ -127,10 +264,10 @@ export interface Transaction {
 }
 
 
-interface ApiResponse<T> {
+export interface ApiResponse<T> {
     status: 'success' | 'error';
     message: string;
-    data: T | string ;
+    data: T  ;
 }
 
 export interface ApiResponseType{

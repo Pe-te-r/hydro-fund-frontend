@@ -16,7 +16,7 @@ interface VerifyCodeRequest {
 
 export const emailApi = createApi({
     reducerPath: 'emailApi',
-    baseQuery: createAuthApi(`${EmailUrl}`),
+    baseQuery: createAuthApi(`${EmailUrl}/email`),
     endpoints: (builder) => ({
         sendEmail: builder.query<EmailResponse, string>({
             query: (userId) => `/${userId}`,

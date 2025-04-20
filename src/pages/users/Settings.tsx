@@ -172,10 +172,7 @@ const SettingsPage = () => {
     };
 
     const handlePasswordUpdate = async(): Promise<void> => {
-        console.log('Password update data:', {
-            old: passwordData.old,
-            new: passwordData.new
-        });
+
         try {
             const info =await updateUser({password:{new:passwordData.new,old:passwordData.old},id:profileData.id})
             toast.success(info.data?.message);
@@ -196,12 +193,10 @@ const SettingsPage = () => {
     const handle2FAToggle = async(): Promise<void> => {
         if (userData.twoFactorEnabled) {
             const info = await send2Fa({ id: profileData.id, twoFactorSecretCode: faValue,twoFactorEnabled:false }).unwrap()
-            console.log(faValue)
-            console.log(info)
-            console.log('Disabling 2FA');
             toast.success(info.message);
         } else {
             setShow2FASetup(true);
+            toast.error('Failed to verify 2FA code');
         }
     };
 
@@ -212,7 +207,7 @@ const SettingsPage = () => {
             const info = await send2Fa({ id: profileData.id, twoFactorSecretCode: faValue, }).unwrap()
             toast.success( info.message)
             
-            if (info.success===true) {
+            if (info.success===true||info.success==='success') {
                 await refetch();
                 setShow2FASetup(false);
                 setFaValue('');
@@ -451,14 +446,31 @@ const SettingsPage = () => {
                     ) : (
                         <div>
                             <p className="text-sm text-gray-600">
-                                Last changed: {new Date(userData.password.lastChanged).toLocaleDateString()}
+                                    Last changed: {new Date(userData.password.lastChanged).toLocaleString(undefined, {
+                                        weekday: 'short',
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                            })}
                             </p>
                             {!canEditPassword() && (
-                                <p className="text-sm text-yellow-600 mt-1">
-                                    You can only change your password every 3 days. Next change available on {
-                                        new Date(new Date(userData.password.lastChanged).getTime() + 3 * 24 * 60 * 60 * 1000
-                                        ).toLocaleDateString()}
-                                </p>
+                                    <p className="text-sm text-yellow-600 mt-1">
+                                        You can only change your password every 3 days. Next change available on {
+                                            new Date(
+                                                new Date(userData.password.lastChanged).getTime() + 3 * 24 * 60 * 60 * 1000
+                                            ).toLocaleString(undefined, {
+                                                weekday: 'short',
+                                                year: 'numeric',
+                                                month: 'long',
+                                                day: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit',
+                                            })
+                                        }
+                                    </p>
+
                             )}
                         </div>
                     )}
@@ -562,26 +574,6 @@ const SettingsPage = () => {
                                 />
                             </div>
 
-                            {/* <div className="flex gap-3">
-                                <button
-                                    onClick={() => setShow2FACodeVerification(false)}
-                                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={twoFACodeVerified ? handle2FAUpdate : handle2FAVerify}
-                                    className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-                                >
-                                    {twoFACodeVerified ? (
-                                        'Confirm Disable'
-                                    ) : (
-                                        <>
-                                            <FiCheck size={18} /> Verify Code
-                                        </>
-                                    )}
-                                </button>
-                            </div> */}
                         </div>
                     )}
 

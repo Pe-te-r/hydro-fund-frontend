@@ -50,7 +50,8 @@ const AdminWithdrawalsPage = () => {
     } = useAllHistoryQuery(null, {
         refetchOnFocus: true,
         refetchOnMountOrArgChange: true,
-        refetchOnReconnect: true
+        refetchOnReconnect: true,
+        pollingInterval:10000,
     });
 
     const [cancelWithdrawal] = useCancelWithdrawMutation();
@@ -416,7 +417,7 @@ const AdminWithdrawalsPage = () => {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900 font-medium">${transaction.amount}</div>
+                                                <div className="text-sm text-gray-900 font-medium">KES {transaction.amount}</div>
                                                 <div className="text-sm text-gray-500">Fee: KES {transaction.fee}</div>
                                                 <div className="text-xs text-gray-400 mt-1">ID: {transaction.id.slice(0, 8)}...</div>
                                             </td>

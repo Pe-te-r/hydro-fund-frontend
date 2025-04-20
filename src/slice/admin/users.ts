@@ -1,4 +1,5 @@
 // types.ts (additional types for the admin users)
+import {  AdminUserServiceResponse, ApiResponse } from '../../types/type';
 import { createAuthApi } from '../baseAuth';
 import { ApiUrl as AdminUserApiUrl } from '../url';
 export interface AdminUser {
@@ -37,6 +38,10 @@ export const adminUserApi = createApi({
             query: () => '/users', // Adjust the endpoint as needed
             providesTags: ['AdminUsers'], // For cache invalidation
         }),
+        getOneUser: builder.query<ApiResponse<AdminUserServiceResponse>, string>({
+            query: (id) => `/users/${id}` ,// Adjust the endpoint as needed
+            providesTags: ['AdminUsers'], // For cache invalidation
+        }),
         updateUserStatus: builder.mutation<
             AdminUsersResponse,
             { email: string; status: string }
@@ -52,4 +57,4 @@ export const adminUserApi = createApi({
     }),
 });
 
-export const { useGetAdminUsersQuery, useUpdateUserStatusMutation } = adminUserApi;
+export const { useGetAdminUsersQuery, useUpdateUserStatusMutation,useGetOneUserQuery } = adminUserApi;

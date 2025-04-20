@@ -33,7 +33,7 @@ interface UpdateSettingsRequest {
 }
 
 interface UpdateSettingsResponse {
-    success: boolean;
+    success: boolean | string;
     message: string;
 }
 

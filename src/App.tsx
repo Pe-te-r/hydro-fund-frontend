@@ -22,6 +22,7 @@ import AdminLayout from './components/AdminLayout';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 import InvestmentPage from './pages/InvestmentPage';
+import AdminUserData from './pages/admin/adminUserData';
 
 // Define props for our route components
 interface RouteComponentProps {
@@ -161,6 +162,16 @@ function App() {
               <ProtectedRoute requiredRole="admin">
                 <AdminLayout>
                   <AdminUsersPage />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/users/:id"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminLayout>
+                  <AdminUserData />
                 </AdminLayout>
               </ProtectedRoute>
             }
