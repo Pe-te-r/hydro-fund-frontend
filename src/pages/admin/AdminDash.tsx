@@ -259,7 +259,7 @@ const AdminDashboard = () => {
                                                 <div className="text-xs text-gray-500 mt-1">
                                                     <div className="flex justify-between">
                                                         <span>User ID: {withdrawal.userId.substring(0, 8)}...</span>
-                                                        <span>{new Date(withdrawal?.createAt || '').toLocaleDateString()}</span>
+                                                        <span>{new Date(withdrawal.createdAt || '').toLocaleDateString()}</span>
                                                     </div>
                                                     <div className="mt-1">
                                                         <span className="block">Email: {withdrawal.user?.email || 'N/A'}</span>

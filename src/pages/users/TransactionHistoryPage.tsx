@@ -132,7 +132,7 @@ export default function TransactionHistoryPage() {
     const formatCurrency = (value: string) => {
         return parseFloat(value).toLocaleString('en-US', {
             style: 'currency',
-            currency: 'USD',
+            currency: 'KES',
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
         });

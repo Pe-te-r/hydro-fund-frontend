@@ -1,8 +1,9 @@
 import { useState, useMemo } from 'react';
 import { FiClock, FiCheckCircle, FiDollarSign, FiCalendar, FiPlusCircle } from 'react-icons/fi';
 import { format } from 'date-fns';
-import { Order, useGetUserOrdersQuery } from '../slice/invest';
+import { Order, useGetClaimMutation, useGetUserOrdersQuery } from '../slice/invest';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 
 // Helper function to format money values
 const formatMoney = (value: number | string) => {
@@ -19,7 +20,7 @@ const InvestmentPage = () => {
     const { user } = useAuth();
     const userId = user?.id || '';
     const [activeTab, setActiveTab] = useState<'active' | 'completed'>('active');
-    const { data: ordersResponse, isLoading, isError } = useGetUserOrdersQuery(userId,{refetchOnFocus:true,refetchOnMountOrArgChange:true,refetchOnReconnect:true});
+    const { data: ordersResponse, isLoading, isError,refetch } = useGetUserOrdersQuery(userId,{refetchOnFocus:true,refetchOnMountOrArgChange:true,refetchOnReconnect:true});
     console.log(ordersResponse)
 
     const orders = useMemo(() => {
@@ -39,20 +40,37 @@ const InvestmentPage = () => {
             const daysPassed = Math.floor(
                 (new Date().getTime() - new Date(item.createdAt || '').getTime()) / (1000 * 60 * 60 * 24)
             );
-            const currentEarnings = Math.min(daysPassed * Number(item.dailyIncome), Number(item.totalIncome));
+            const currentEarnings = Math.min(
+                daysPassed * Number(item.dailyIncome) * item.quantity,
+                Number(item.totalIncome) * item.quantity
+            );
             return acc + currentEarnings;
         }, 0);
     };
 
     const calculateOrderPotential = (order: Order) => {
-        return order.items.reduce((acc, item) => acc + Number(item.totalIncome), 0);
+        return order.items.reduce((acc, item) => acc + (Number(item.totalIncome) * item.quantity), 0);
     };
+    const [claimOrder, ] = useGetClaimMutation();
 
-    const handleClaimOrder = (orderId: string) => {
-        console.log('Claimed', orderId);
-        // In a real app, you would dispatch an action here to update the order status
+
+    const handleClaimOrder = async (orderId: string) => {
+        try {
+            const response = await claimOrder(orderId).unwrap();
+            console.log(response)
+
+            if (response.status === 'success') {
+                toast.success('Order claimed successfully!');
+                await refetch()
+                // Consider adding refetch logic here if needed
+            } else {
+                toast.error(response.message || 'Failed to claim order');
+            }
+        } catch (error) {
+            toast.error('An error occurred while claiming the order');
+            console.error('Claim order error:', error);
+        }
     };
-
     if (isLoading) return <div className="flex justify-center py-8">Loading orders...</div>;
     if (isError) return <div className="flex justify-center py-8 text-red-500">Error loading orders</div>;
 
@@ -152,8 +170,9 @@ const InvestmentPage = () => {
                                             );
                                             const itemCurrentEarnings = Math.min(
                                                 daysPassed * Number(item.dailyIncome),
-                                                Number(item.totalIncome)
+                                                Number(item.totalIncome) * item.quantity
                                             );
+                                            console.log(itemCurrentEarnings)
                                             const endDate = new Date(item.createdAt || '');
                                             endDate.setDate(endDate.getDate() + item.cycle);
                                             const isItemCompleted = daysPassed >= item.cycle;

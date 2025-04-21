@@ -1,120 +1,112 @@
 import React from 'react';
-import { FiFacebook, FiTwitter, FiInstagram, FiLinkedin, FiYoutube, FiMail, FiPhone, FiMapPin } from 'react-icons/fi';
+import { FiMail, FiChevronDown } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
 
-const Footer = () => {
+interface FooterLink {
+    name: string;
+    url: string;
+}
+
+interface ContactItem {
+    name: string;
+    icon: React.ReactNode;
+    url:string
+}
+
+const Footer: React.FC = () => {
     const currentYear = new Date().getFullYear();
+    const [expandedSection, setExpandedSection] = React.useState<string | null>(null);
 
-    const quickLinks = [
+    const toggleSection = (section: string) => {
+        setExpandedSection(expandedSection === section ? null : section);
+    };
+
+    const quickLinks: FooterLink[] = [
         { name: 'Home', url: '/' },
-        { name: 'About Us', url: '/about' },
+        { name: 'About', url: '/about' },
         { name: 'Invest', url: '/investments' },
-        { name: 'Contact', url: '/contact' },
     ];
 
-    const legalLinks = [
+    const legalLinks: FooterLink[] = [
         { name: 'Privacy Policy', url: '/privacy' },
-        { name: 'Terms of Service', url: '/terms' },
+        { name: 'Terms', url: '/terms' },
+        { name: 'Disclaimer', url: '/disclaimer' },
     ];
 
-    const socialLinks = [
-        { icon: <FiFacebook />, url: 'https://facebook.com/hydrofund' },
-        { icon: <FiTwitter />, url: 'https://twitter.com/hydrofund' },
-        { icon: <FiInstagram />, url: 'https://instagram.com/hydrofund' },
-        { icon: <FiLinkedin />, url: 'https://linkedin.com/company/hydrofund' },
-        { icon: <FiYoutube />, url: 'https://youtube.com/hydrofund' },
+    const contactItems: ContactItem[] = [
+        { name: 'solution@hydrofundsolutions.com', icon: <FiMail />, url:'' },
     ];
 
     return (
-        <footer className="bg-gradient-to-r from-blue-900 to-blue-700 text-white pt-12 pb-6">
-            <div className="container mx-auto px-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {/* Logo and Description */}
-                    <div className="lg:col-span-1">
-                        <h2 className="text-2xl font-bold mb-4">HydroFund</h2>
-                        <p className="text-blue-100 mb-4">
-                            Empowering sustainable hydropower projects through community investment and innovation.
-                        </p>
-                        <div className="flex space-x-4">
-                            {socialLinks.map((social, index) => (
-                                <Link
-                                    key={index}
-                                    to={social.url}
-                                    // target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-white hover:text-blue-300 transition-colors duration-300 text-xl"
-                                >
-                                    {social.icon}
-                                </Link>
-                            ))}
+        <footer className="bg-gradient-to-br from-blue-800 to-blue-600 text-white">
+            <div className="container mx-auto px-4 py-8">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    {/* Brand Column */}
+                    <div className="md:col-span-1">
+                        <div className="flex items-center mb-4">
+                            <div className="bg-white/10 p-2 rounded-lg mr-3">
+                                <div className="w-10 h-10 bg-white rounded flex items-center justify-center text-blue-800 font-bold">HF</div>
+                            </div>
+                            <h2 className="text-xl font-bold">HydroFund</h2>
                         </div>
+                        <p className="text-blue-100 text-sm mb-4">
+                            Sustainable hydropower investments for a greener future.
+                        </p>
                     </div>
 
-                    {/* Quick Links */}
-                    <div>
-                        <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
-                        <ul className="space-y-2">
-                            {quickLinks.map((link, index) => (
-                                <li key={index}>
-                                    <Link
-                                        to={link.url}
-                                        className="text-blue-100 hover:text-white transition-colors duration-300"
-                                    >
-                                        {link.name}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                    {/* Collapsible Sections */}
+                    {[
+                        { title: 'Quick Links', items: quickLinks, id: 'quick' },
+                        { title: 'Legal', items: legalLinks, id: 'legal' },
+                        { title: 'Contact', items: contactItems, id: 'contact' }
+                    ].map((section) => (
+                        <div key={section.id} className="md:col-span-1">
+                            <button
+                                className="md:hidden w-full flex justify-between items-center py-2 text-left"
+                                onClick={() => toggleSection(section.id)}
+                                aria-expanded={expandedSection === section.id}
+                            >
+                                <h3 className="text-lg font-semibold">{section.title}</h3>
+                                <FiChevronDown className={`transition-transform ${expandedSection === section.id ? 'rotate-180' : ''}`} />
+                            </button>
 
-                    {/* Legal Links */}
-                    <div>
-                        <h3 className="text-lg font-semibold mb-4">Legal</h3>
-                        <ul className="space-y-2">
-                            {legalLinks.map((link, index) => (
-                                <li key={index}>
-                                    <Link
-                                        to={link.url}
-                                        className="text-blue-100 hover:text-white transition-colors duration-300"
-                                    >
-                                        {link.name}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                            <h3 className="hidden md:block text-lg font-semibold mb-4">{section.title}</h3>
 
-                    {/* Contact Info */}
-                    <div>
-                        <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
-                        <ul className="space-y-3">
-                            <li className="flex items-start">
-                                <FiMail className="mt-1 mr-3" />
-                                <span>contact@hydrofund.org</span>
-                            </li>
-                            <li className="flex items-start">
-                                <FiPhone className="mt-1 mr-3" />
-                                <span>+1 (555) 123-4567</span>
-                            </li>
-                            <li className="flex items-start">
-                                <FiMapPin className="mt-1 mr-3" />
-                                <span>123 Energy Street, Hydroville, HV 12345</span>
-                            </li>
-                        </ul>
-                    </div>
+                            <ul className={`${expandedSection === section.id ? 'block' : 'hidden'} md:block space-y-2`}>
+                                {section.items.map((item, index) => (
+                                    <li key={index}>
+                                       {section.id === 'contact' ? (
+                                           <div className="flex items-start text-blue-100 hover:text-white transition-colors">
+                                               <span className="mr-2 mt-0.5">{(item as ContactItem).icon}</span>
+                                               <span>{item.name}</span>
+                                           </div>
+                                       ) : (
+                                           <Link
+                                                   to={item?.url || ''}
+                                               className="text-blue-100 hover:text-white transition-colors block py-1 text-sm"
+                                           >
+                                               {item.name}
+                                           </Link>
+                                       )}
+                                   </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
                 </div>
 
-                {/* Divider */}
-                <div className="border-t border-blue-600 my-6"></div>
+                <div className="border-t border-blue-500/30 my-6"></div>
 
-                {/* Copyright */}
                 <div className="flex flex-col md:flex-row justify-between items-center">
-                    <p className="text-blue-200 text-sm">
+                    <p className="text-blue-200 text-xs md:text-sm order-2 md:order-1 mt-4 md:mt-0">
                         &copy; {currentYear} HydroFund. All rights reserved.
                     </p>
-                    <p className="text-blue-200 text-sm mt-2 md:mt-0">
-                        Committed to sustainable energy solutions.
-                    </p>
+
+                    <div className="order-1 md:order-2 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs md:text-sm">
+                        <Link to="/privacy" className="text-blue-200 hover:text-white">Privacy</Link>
+                        <Link to="/terms" className="text-blue-200 hover:text-white">Terms</Link>
+                        <Link to="/accessibility" className="text-blue-200 hover:text-white">Accessibility</Link>
+                    </div>
                 </div>
             </div>
         </footer>

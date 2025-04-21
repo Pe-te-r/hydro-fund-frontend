@@ -76,7 +76,13 @@ export const investmentApi = createApi({
                 url: `/order/${orderId}`,
                 method: 'GET',
             }),
-            providesTags: (result, error, id) => [{ type: 'Orders', id }],
+            // providesTags: (id) => [{ type: 'Orders', id }],
+        }),
+        getClaim: builder.mutation<ApiResponse<boolean>,string>({
+                    query: (id) => ({
+                        url: `/${id}/claim`,
+                        method: 'PATCH',
+                    }),
         }),
     }),
 });
@@ -85,4 +91,5 @@ export const {
     useCreateOrderMutation,
     useGetUserOrdersQuery,
     useGetOrderByIdQuery,
+    useGetClaimMutation
 } = investmentApi;

@@ -232,16 +232,16 @@ export default function HomePage() {
                                             <FiMail className="text-blue-600 mt-1 mr-3" />
                                             <div>
                                                 <p className="font-medium text-gray-900">Email</p>
-                                                <p className="text-gray-600">support@hydrofund.com</p>
+                                                <p className="text-gray-600">solution@hydrofundsolutions.com</p>
                                             </div>
                                         </div>
-                                        <div className="flex items-start">
+                                        {/* <div className="flex items-start">
                                             <FiMessageSquare className="text-blue-600 mt-1 mr-3" />
                                             <div>
                                                 <p className="font-medium text-gray-900">Telegram</p>
                                                 <p className="text-gray-600">@HydroFundSupport</p>
                                             </div>
-                                        </div>
+                                        </div> */}
                                     </div>
                                 </div>
                                 <div>
@@ -250,7 +250,9 @@ export default function HomePage() {
                                         Connect with other HydroFund users, get updates, and share experiences in our official community groups.
                                     </p>
                                     <button className="px-6 py-3 cursor-pointer bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md">
-                                        Join Telegram Group
+                                        <a href="https://t.me/+wf2hWsIEhm4yNzg0" target="_blank" rel="noopener noreferrer">
+                                            Join our Telegram group
+                                        </a>
                                     </button>
                                 </div>
                             </div>
