@@ -18,7 +18,7 @@ export default function InvestmentProducts() {
     const [products, setProducts] = useState<InvestmentProduct[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [selectedCategory, setSelectedCategory] = useState<string>('all');
+    const [selectedCategory, setSelectedCategory] = useState<string>('starter');
     const { cartItems, addToCart, removeFromCart } = useCart();
 
     useEffect(() => {

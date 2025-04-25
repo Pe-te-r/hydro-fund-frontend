@@ -65,8 +65,8 @@ export const mockProducts: InvestmentProduct[] = [
                         id: '7',
                         name: 'Welfare Products.4',
                         price: 180000,
-                        cycle: 5,
-                        dailyIncome: 144000,
+                        cycle: 10,
+                        dailyIncome: 72000,
                         totalIncome: 720000,
                         category: 'welfare',
                         riskLevel: 'medium'
