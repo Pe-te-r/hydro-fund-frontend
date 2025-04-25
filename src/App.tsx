@@ -23,6 +23,9 @@ import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 import InvestmentPage from './pages/InvestmentPage';
 import AdminUserData from './pages/admin/adminUserData';
+import TermsAndConditionsPage from './components/TermsAndConditionsPage';
+import DisclaimerPage from './components/DisclaimerPage';
+import PrivacyPolicyPage from './components/PrivacyPolicyPage';
 
 // Define props for our route components
 interface RouteComponentProps {
@@ -51,6 +54,9 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/terms" element={<TermsAndConditionsPage />} />
+          <Route path="/disclaimer" element={<DisclaimerPage />} />
+          <Route path="/privacy" element={<PrivacyPolicyPage />} />
 
           {/* Protected routes */}
           <Route

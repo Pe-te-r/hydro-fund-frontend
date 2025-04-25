@@ -268,7 +268,7 @@ const Register = () => {
                                 required
                             />
                             <label htmlFor="terms" className="ml-2 block text-sm text-gray-700 cursor-pointer">
-                                I agree to the <a href="#" className="text-blue-600 hover:text-blue-800">Terms</a> and <a href="#" className="text-blue-600 hover:text-blue-800">Privacy Policy</a>
+                                I agree to the <Link to="/terms" className="text-blue-600 hover:text-blue-800">Terms</Link> and <Link to="/privacy" className="text-blue-600 hover:text-blue-800">Privacy Policy</Link>
                             </label>
                         </div>
 

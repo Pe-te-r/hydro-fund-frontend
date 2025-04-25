@@ -4,10 +4,10 @@ export const mockProducts: InvestmentProduct[] = [
                     {
                         id: '1',
                         name: 'M-pesa Partnership Project',
-                        price: 16200,
+                        price: 16000,
                         cycle: 10,
-                        dailyIncome: 15600,
-                        totalIncome: 156000,
+                        dailyIncome: 3000,
+                        totalIncome: 30000,
                         category: 'telecom',
                         riskLevel: 'medium'
                     },
@@ -36,8 +36,8 @@ export const mockProducts: InvestmentProduct[] = [
                         name: 'VIP 1',
                         price: 27000,
                         cycle: 3,
-                        dailyIncome: 19200,
-                        totalIncome: 57600,
+                        dailyIncome: 18000,
+                        totalIncome: 54000,
                         category: 'vip',
                         riskLevel: 'low'
                     },
@@ -46,8 +46,8 @@ export const mockProducts: InvestmentProduct[] = [
                         name: 'SAFE OIL FIELD',
                         price: 45000,
                         cycle: 7,
-                        dailyIncome: 60000,
-                        totalIncome: 420000,
+                        dailyIncome: 12857,
+                        totalIncome: 90000,
                         category: 'oil',
                         riskLevel: 'medium'
                     },
@@ -106,8 +106,8 @@ export const mockProducts: InvestmentProduct[] = [
                         name: 'Buffett Fund-1',
                         price: 4560,
                         cycle: 10,
-                        dailyIncome: 3000,
-                        totalIncome: 30000,
+                        dailyIncome: 800,
+                        totalIncome: 8000,
                         category: 'fund',
                         riskLevel: 'medium'
                     },
@@ -116,8 +116,8 @@ export const mockProducts: InvestmentProduct[] = [
                         name: 'Welfare Products',
                         price: 8550,
                         cycle: 10,
-                        dailyIncome: 7080,
-                        totalIncome: 70800,
+                        dailyIncome: 1702,
+                        totalIncome: 17020,
                         category: 'welfare',
                         riskLevel: 'medium'
                     }

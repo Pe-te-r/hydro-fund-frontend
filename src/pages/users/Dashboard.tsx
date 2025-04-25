@@ -1,6 +1,7 @@
+import copy from 'clipboard-copy';
 import { FiDollarSign, FiUsers, FiPieChart, FiTrendingUp, FiClock, FiAward, FiCopy } from 'react-icons/fi';
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../context/AuthContext';
 import { useGetDashboardByIdQuery } from '../../slice/dashboard';
@@ -27,14 +28,31 @@ export default function AccountDashboard() {
         if (diffInMonths === 1) return '1 month';
         return `${diffInMonths} months`;
     };
+    const [referralLink, setShareUrl] = useState('');
+    console.log(referralLink)
+
+    useEffect(() => {
+        if (dashboardData?.ownReferral?.referralCode) {
+            const baseUrl = window.location.origin;
+            const refCode = dashboardData.ownReferral.referralCode;
+            setShareUrl(`${baseUrl}/join?ref=${refCode}`);
+        }
+    }, [dashboardData?.ownReferral?.referralCode]);  // Only re-run when referralCode changes
+
 
     const copyReferralLink = () => {
-        const referralCode = dashboardData?.ownReferral?.referralCode || '';
-        const referralLink = `http://localhost:5173/join?ref=${referralCode}`;
-        navigator.clipboard.writeText(referralLink);
-        setCopied(true);
-        toast.success('Referral link copied!');
-        setTimeout(() => setCopied(false), 2000);
+        if (!referralLink) return;
+
+        copy(referralLink)
+            .then(() => {
+                setCopied(true);
+                toast.success('Copied!');
+                setTimeout(() => setCopied(false), 2000);
+            })
+            .catch((err:unknown) => {
+                toast.error('Copy failed');
+                console.error(err);
+            });
     };
 
     if (isLoading) return (
@@ -166,17 +184,21 @@ export default function AccountDashboard() {
                     </div>
                     <div className="p-6">
                         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                            <div>
+                            <div className="flex-1 min-w-0">
                                 <p className="text-sm text-gray-500 mb-1">Share your referral link and earn bonuses</p>
-                                <div className="flex items-center bg-gray-100 rounded-lg p-2">
-                                    <code className="text-sm font-mono text-gray-800">
-                                        http://localhost:5173/join?ref={dashboardData?.ownReferral?.referralCode || 'yourcode'}
+                                <div className="flex items-center bg-gray-100 rounded-lg p-2 overflow-x-auto">
+                                    <code className="text-sm font-mono text-gray-800 truncate">
+                                        {referralLink || "Generating link..."}
                                     </code>
                                 </div>
                             </div>
                             <button
                                 onClick={copyReferralLink}
-                                className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
+                                disabled={!referralLink}
+                                className={`flex items-center justify-center px-4 py-2 rounded-lg transition-colors cursor-pointer ${!referralLink
+                                        ? 'bg-gray-400 cursor-not-allowed'
+                                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                    }`}
                             >
                                 <FiCopy className="mr-2" />
                                 {copied ? 'Copied!' : 'Copy Link'}
