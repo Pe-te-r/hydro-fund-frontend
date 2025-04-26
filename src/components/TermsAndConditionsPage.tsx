@@ -33,7 +33,7 @@ const TermsAndConditionsPage = () => {
                     <div>
                         <h2 className="text-xl font-semibold text-gray-800">3. Investments</h2>
                         <ul className="list-disc pl-5 space-y-2 mt-2">
-                            <li>Minimum deposit: KES 300</li>
+                            <li>Minimum deposit: KES 400</li>
                             <li>Each investment product includes:
                                 <ul className="list-circle pl-5 mt-2 space-y-1">
                                     <li>A fixed price</li>
@@ -49,7 +49,7 @@ const TermsAndConditionsPage = () => {
                     {/* Sections 4-12 would follow the same structure */}
 
                     <div>
-                        <h2 className="text-xl font-semibold text-gray-800">12. Support & Contact</h2>
+                        <h2 className="text-xl font-semibold text-gray-800">4. Support & Contact</h2>
                         <p className="mt-2">For questions or assistance, you can reach us at:</p>
                         <ul className="list-disc pl-5 space-y-2 mt-2">
                             <li>Email: support@hydrofundsolutions.com</li>

@@ -14,8 +14,8 @@ export default function WithdrawPage() {
     const [alternativeNumber, setAlternativeNumber] = useState('');
 
     // Constants
-    const MIN_WITHDRAWAL = 100;
-    const MAX_WITHDRAWAL = 5000;
+    const MIN_WITHDRAWAL = 400;
+    const MAX_WITHDRAWAL = 200000;
     const TRANSACTION_FEE_PERCENTAGE = 0.08;
 
     
@@ -270,10 +270,10 @@ export default function WithdrawPage() {
                                 <div className="grid grid-cols-4 gap-2">
                                     <button
                                         type="button"
-                                        onClick={() => setAmount('100')}
+                                        onClick={() => setAmount('400')}
                                         className="py-2 px-3 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm"
                                     >
-                                        Ksh 100
+                                        Ksh 400
                                     </button>
                                     <button
                                         type="button"

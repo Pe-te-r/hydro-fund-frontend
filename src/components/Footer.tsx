@@ -42,7 +42,7 @@ const Footer: React.FC = () => {
             <div className="container mx-auto px-4 py-8">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                     {/* Brand Column */}
-                    <div className="md:col-span-1">
+                    <Link to='/' className="md:col-span-1">
                         <div className="flex items-center mb-4">
                             <div className="bg-white/10 p-2 rounded-lg mr-3">
                                 <div className="w-10 h-10 bg-white rounded flex items-center justify-center text-blue-800 font-bold">HF</div>
@@ -52,7 +52,7 @@ const Footer: React.FC = () => {
                         <p className="text-blue-100 text-sm mb-4">
                             Sustainable hydropower investments for a greener future.
                         </p>
-                    </div>
+                    </Link>
 
                     {/* Collapsible Sections */}
                     {[
@@ -105,7 +105,7 @@ const Footer: React.FC = () => {
                     <div className="order-1 md:order-2 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs md:text-sm">
                         <Link to="/privacy" className="text-blue-200 hover:text-white">Privacy</Link>
                         <Link to="/terms" className="text-blue-200 hover:text-white">Terms</Link>
-                        <Link to="/accessibility" className="text-blue-200 hover:text-white">Accessibility</Link>
+                        <Link to="/disclaimer" className="text-blue-200 hover:text-white">Disclaimer</Link>
                     </div>
                 </div>
             </div>
