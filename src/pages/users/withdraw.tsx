@@ -16,7 +16,7 @@ export default function WithdrawPage() {
     // Constants
     const MIN_WITHDRAWAL = 400;
     const MAX_WITHDRAWAL = 200000;
-    const TRANSACTION_FEE_PERCENTAGE = 0.08;
+    const TRANSACTION_FEE_PERCENTAGE = 0.1;
 
     
     const {user:userData} = useAuth()
@@ -167,7 +167,7 @@ export default function WithdrawPage() {
                                 <p className="text-2xl font-bold">Ksh {user.withdrawable.toFixed(2)}</p>
                             </div>
                         </div>
-                        <p className="text-xs mt-2 opacity-80">*After 8% transaction fee deduction</p>
+                        <p className="text-xs mt-2 opacity-80">*After { TRANSACTION_FEE_PERCENTAGE *100}% transaction fee deduction</p>
                     </div>
 
                     {/* Withdrawal Form */}
@@ -306,7 +306,7 @@ export default function WithdrawPage() {
                                             <span className="text-sm font-medium">Ksh {parseFloat(amount).toLocaleString()}</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-sm text-gray-600">Transaction fee (8%):</span>
+                                            <span className="text-sm text-gray-600">Transaction fee { TRANSACTION_FEE_PERCENTAGE * 100}%:</span>
                                             <span className="text-sm font-medium">Ksh {transactionFee.toFixed(2)}</span>
                                         </div>
                                         <div className="flex justify-between">
@@ -348,7 +348,7 @@ export default function WithdrawPage() {
                             <div className="flex-shrink-0 h-5 w-5 text-blue-500 mr-2 mt-0.5">
                                 <FiAlertCircle className="h-full w-full" />
                             </div>
-                            <span>8% transaction fee applies to all withdrawals</span>
+                            <span>{ TRANSACTION_FEE_PERCENTAGE * 100}% transaction fee applies to all withdrawals</span>
                         </li>
                         <li className="flex items-start">
                             <div className="flex-shrink-0 h-5 w-5 text-blue-500 mr-2 mt-0.5">
