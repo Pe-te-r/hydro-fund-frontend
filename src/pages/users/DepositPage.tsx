@@ -369,6 +369,7 @@ export default function DepositPage() {
                                             type="submit"
                                             className="flex-1 py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center justify-center"
                                             disabled={isLoading}
+                                            onClick={handleDepositVerificationSubmit}
                                         >
                                             {isLoading ? (
                                                 <>
