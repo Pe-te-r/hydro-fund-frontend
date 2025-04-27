@@ -28,17 +28,23 @@ const SecuritySettings = ({ userData, onPasswordUpdate, on2FAUpdate }: SecurityS
     const [showPasswordCodeVerification, setShowPasswordCodeVerification] = useState(false);
     const [passwordCodeVerified, setPasswordCodeVerified] = useState(false);
     const [passwordError, setPasswordError] = useState('');
+    const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+
 
     // 2FA state
     const [show2FASetup, setShow2FASetup] = useState(false);
     const [twoFACode, setTwoFACode] = useState(['', '', '', '', '', '']);
     const [twoFAError, setTwoFAError] = useState('');
     const twoFARefs = useRef<(HTMLInputElement | null)[]>([]);
+    const [isEnabling2FA, setIsEnabling2FA] = useState(false);
+
 
     const [showDisable2FA, setShowDisable2FA] = useState(false);
     const [disable2FACode, setDisable2FACode] = useState(['', '', '', '', '', '']);
     const [disable2FAError, setDisable2FAError] = useState('');
     const disable2FARefs = useRef<(HTMLInputElement | null)[]>([]);
+    const [isDisabling2FA, setIsDisabling2FA] = useState(false);
+
 
     const canEditPassword = (): boolean => {
         if (!userData.password?.lastChanged) return true;
@@ -118,14 +124,15 @@ const SecuritySettings = ({ userData, onPasswordUpdate, on2FAUpdate }: SecurityS
         setShowPasswordCodeVerification(true);
     };
 
+
     const handlePasswordUpdate = async () => {
+        setIsUpdatingPassword(true);
         try {
             await onPasswordUpdate({ old: passwordData.old, new: passwordData.new });
             setIsEditingPassword(false);
-            // setPasswordCodeVerified(false);
             setPasswordData({ old: '', new: '', confirm: '' });
         } catch (err) {
-            const error = err as {status:number,data:ErrorResponse}
+            const error = err as { status: number, data: ErrorResponse }
             console.log(error);
             setPasswordError(error.data?.message || 'Failed to update password');
             if (error.data?.message?.toLowerCase().includes('old password')) {
@@ -133,8 +140,11 @@ const SecuritySettings = ({ userData, onPasswordUpdate, on2FAUpdate }: SecurityS
             } else {
                 toast.error(error.data?.message || 'Failed to update password');
             }
+        } finally {
+            setIsUpdatingPassword(false);
         }
     };
+
 
     const handlePasswordCodeVerification = (code: string) => {
         console.log('Password verification code:', code);
@@ -161,14 +171,19 @@ const SecuritySettings = ({ userData, onPasswordUpdate, on2FAUpdate }: SecurityS
             return;
         }
 
+        setIsEnabling2FA(true);
         try {
             await on2FAUpdate({ code, enabled: true });
+            setIsEnabling2FA(false);
             setShow2FASetup(false);
             setTwoFACode(['', '', '', '', '', '']);
             setTwoFAError('');
         } catch (err) {
             const error = err as { status: number, data: ErrorResponse }
             setTwoFAError(error.data?.message || 'Invalid verification code');
+            toast.error(error.data?.message || 'Failed to enable 2FA');
+        } finally {
+            setIsEnabling2FA(false);
         }
     };
 
@@ -179,8 +194,10 @@ const SecuritySettings = ({ userData, onPasswordUpdate, on2FAUpdate }: SecurityS
             return;
         }
 
+        setIsDisabling2FA(true);
         try {
-             await on2FAUpdate({ code, enabled: false });
+            await on2FAUpdate({ code, enabled: false });
+            setIsDisabling2FA(false);
             setShowDisable2FA(false);
             setDisable2FACode(['', '', '', '', '', '']);
             setDisable2FAError('');
@@ -188,8 +205,13 @@ const SecuritySettings = ({ userData, onPasswordUpdate, on2FAUpdate }: SecurityS
             const error = err as { status: number, data: ErrorResponse }
             console.log(error);
             setDisable2FAError(error.data?.message || 'Invalid verification code');
+            toast.error(error.data?.message || 'Failed to disable 2FA');
+        } finally {
+            setIsDisabling2FA(false);
         }
     };
+
+
 
     const twoFactorAuthURI = `otpauth://totp/HydroFund:${userData.email}?secret=${userData.twoFactorSecret}&issuer=HydroFund`;
 
@@ -290,9 +312,22 @@ const SecuritySettings = ({ userData, onPasswordUpdate, on2FAUpdate }: SecurityS
                             {passwordCodeVerified ? (
                                 <button
                                     onClick={handlePasswordUpdate}
-                                    className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 cursor-pointer"
+                                    disabled={isUpdatingPassword}
+                                    className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
                                 >
-                                    <FiCheck className="mr-1" /> Update Password
+                                    {isUpdatingPassword ? (
+                                        <>
+                                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            Updating...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <FiCheck className="mr-1" /> Update Password
+                                        </>
+                                    )}
                                 </button>
                             ) : (
                                 <button
@@ -414,10 +449,24 @@ const SecuritySettings = ({ userData, onPasswordUpdate, on2FAUpdate }: SecurityS
 
                                 <button
                                     onClick={handleEnable2FA}
-                                    className="mt-4 flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer"
+                                    disabled={isEnabling2FA}
+                                    className="mt-4 flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
                                 >
-                                    <FiCheck className="mr-1" /> Verify and Enable
+                                    {isEnabling2FA ? (
+                                        <>
+                                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                            Enabling...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <FiCheck className="mr-1" /> Verify and Enable
+                                        </>
+                                    )}
                                 </button>
+
                             </div>
                         </div>
                     </div>
@@ -465,9 +514,22 @@ const SecuritySettings = ({ userData, onPasswordUpdate, on2FAUpdate }: SecurityS
                             </button>
                             <button
                                 onClick={handleDisable2FA}
-                                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 cursor-pointer"
+                                disabled={isDisabling2FA}
+                                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
                             >
-                                <FiCheck size={18} /> Disable 2FA
+                                {isDisabling2FA ? (
+                                    <>
+                                        <svg className="animate-spin -ml-1 mr-1 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Disabling...
+                                    </>
+                                ) : (
+                                    <>
+                                        <FiCheck size={18} /> Disable 2FA
+                                    </>
+                                )}
                             </button>
                         </div>
                     </div>
