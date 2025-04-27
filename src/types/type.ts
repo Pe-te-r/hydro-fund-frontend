@@ -290,8 +290,14 @@ export interface initialRequestPassword{
     username?: string;
 }
 
+export interface codeVerifyRequest extends initialRequestPassword{
+    code?: string;
+    otp?:string
+}
+
 export interface changePasswordRequest {
     email?: string;
     phone?: string;
     username?: string;
+    password: string;
 }
