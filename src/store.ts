@@ -11,6 +11,7 @@ import { withdrawApi } from './slice/withdraw';
 import { investmentApi } from './slice/invest';
 import { forgetApi } from './slice/forget';
 import { otpApi } from './slice/code';
+import { depositApi } from './slice/deposit';
 
 export const store = configureStore({
     reducer: {
@@ -25,9 +26,10 @@ export const store = configureStore({
         [dashboardApi.reducerPath]:dashboardApi.reducer,
         [adminUserApi.reducerPath]: adminUserApi.reducer,
         [withdrawApi.reducerPath]: withdrawApi.reducer,
+        [depositApi.reducerPath]: depositApi.reducer,
     },
     middleware: (getDefaultMiddleware) =>
-        getDefaultMiddleware().concat(authApi.middleware, otpApi.middleware,forgetApi.middleware,investmentApi.middleware ,userApi.middleware, bonusApi.middleware, withdrawApi.middleware, settingsApi.middleware, adminUserApi.middleware ,emailApi.middleware,dashboardApi.middleware),
+        getDefaultMiddleware().concat(authApi.middleware, depositApi.middleware ,otpApi.middleware,forgetApi.middleware,investmentApi.middleware ,userApi.middleware, bonusApi.middleware, withdrawApi.middleware, settingsApi.middleware, adminUserApi.middleware ,emailApi.middleware,dashboardApi.middleware),
 });
 
 export type AppDispatch = typeof store.dispatch;

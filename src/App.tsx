@@ -27,6 +27,7 @@ import TermsAndConditionsPage from './components/TermsAndConditionsPage';
 import DisclaimerPage from './components/DisclaimerPage';
 import PrivacyPolicyPage from './components/PrivacyPolicyPage';
 import ChangePasswordPage from './pages/ChangePassword';
+import AdminPendingDeposits from './pages/admin/AdminPendingDeposit';
 
 // Define props for our route components
 interface RouteComponentProps {
@@ -190,6 +191,16 @@ function App() {
               <ProtectedRoute requiredRole="admin">
                 <AdminLayout>
                   <AdminWithdrawalsPage />
+                </AdminLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/deposit-pending"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminLayout>
+                  <AdminPendingDeposits />
                 </AdminLayout>
               </ProtectedRoute>
             }

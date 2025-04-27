@@ -34,7 +34,7 @@ const Footer: React.FC = () => {
     ];
 
     const contactItems: ContactItem[] = [
-        { name: 'solution@hydrofundsolutions.com', icon: <FiMail />, url:'' },
+        { name: 'service@hydrofundsolutions.com', icon: <FiMail />, url:'' },
     ];
 
     return (

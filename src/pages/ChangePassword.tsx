@@ -279,7 +279,7 @@ const ForgotPasswordPage = () => {
                     {step === 'verify' && (
                         <div className="space-y-6">
                             <p className="text-sm text-gray-600">
-                                {verificationType === 'code' ?"We've sent a 4-digit code.Please enter it below.":'Use your authenticator app '}
+                                {verificationType === 'code' ? "We've sent a 4-digit code.Please enter it below." : "We've sent a 6-digit code to your authenticator app. Please enter it below."}
                             </p>
 
                             {verificationType === null && (

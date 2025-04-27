@@ -64,6 +64,13 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
                                 User Management
                             </Link>
                             <Link
+                                to="/admin/deposit-pending"
+                                onClick={handleLinkClick}
+                                className="block cursor-pointer px-4 py-2 text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded transition"
+                            >
+                                Deposits
+                            </Link>
+                            <Link
                                 to="/admin/withdrawals"
                                 onClick={handleLinkClick}
                                 className="block cursor-pointer px-4 py-2 text-gray-600 hover:bg-blue-50 hover:text-blue-600 rounded transition"
