@@ -393,7 +393,7 @@ export default function WithdrawPage() {
                                     <span className="font-medium">Ksh {parseFloat(amount).toLocaleString()}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-gray-600">Fee (8%):</span>
+                                    <span className="text-gray-600">Fee (10%):</span>
                                     <span className="font-medium">Ksh {transactionFee.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between">

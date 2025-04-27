@@ -26,6 +26,7 @@ import AdminUserData from './pages/admin/adminUserData';
 import TermsAndConditionsPage from './components/TermsAndConditionsPage';
 import DisclaimerPage from './components/DisclaimerPage';
 import PrivacyPolicyPage from './components/PrivacyPolicyPage';
+import ChangePasswordPage from './pages/ChangePassword';
 
 // Define props for our route components
 interface RouteComponentProps {
@@ -53,6 +54,7 @@ function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/forget" element={<ChangePasswordPage />} />
           <Route path="/register" element={<Register />} />
           <Route path="/terms" element={<TermsAndConditionsPage />} />
           <Route path="/disclaimer" element={<DisclaimerPage />} />

@@ -283,3 +283,15 @@ export interface ApiErrorType{
     status: number;
     data:{status:string,message:string}
 }
+
+export interface initialRequestPassword{
+    email?: string;
+    phone?: string;
+    username?: string;
+}
+
+export interface changePasswordRequest {
+    email?: string;
+    phone?: string;
+    username?: string;
+}
