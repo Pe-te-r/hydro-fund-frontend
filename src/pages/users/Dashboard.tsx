@@ -10,6 +10,7 @@ export default function AccountDashboard() {
     const { user } = useAuth();
     const { data: dashboardData, isLoading, isError } = useGetDashboardByIdQuery(user?.id || '',{refetchOnFocus:true,refetchOnReconnect:true,refetchOnMountOrArgChange:true});
     const [copied, setCopied] = useState(false);
+    console.log(dashboardData)
 
     const formatVipTier = (tier: string) => {
         return tier === 'standard' ? 'Standard' :
@@ -82,7 +83,7 @@ export default function AccountDashboard() {
                 </div>
 
                 {/* Stats Row 1 */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Balance Card */}
                     <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition-shadow">
                         <div className="flex items-center justify-between">
@@ -100,6 +101,23 @@ export default function AccountDashboard() {
                             <FiTrendingUp className="mr-1" />
                             <span>Ready to invest</span>
                         </div>
+                    </div>
+                    <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition-shadow">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-medium text-gray-500">Total deposit</p>
+                                <p className="text-2xl font-bold text-gray-900">
+                                    Ksh {parseFloat(dashboardData?.deposit || '0').toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </p>
+                            </div>
+                            <div className="p-3 rounded-full bg-blue-100 text-blue-600">
+                                <FiDollarSign className="h-6 w-6" />
+                            </div>
+                        </div>
+                        {/* <div className="mt-4 flex items-center text-sm text-green-600">
+                            <FiTrendingUp className="mr-1" />
+                            <span>Ready to invest</span>
+                        </div> */}
                     </div>
 
                     {/* Total Invested Card */}

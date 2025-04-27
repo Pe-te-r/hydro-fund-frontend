@@ -218,6 +218,7 @@ export interface UserData {
     username: string;
     email: string;
     phone: string;
+    deposit: string;
     status: string;
     balance: string;
     twoFactorSecret: string | null;

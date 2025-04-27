@@ -5,6 +5,7 @@ import { createAuthApi } from './baseAuth';
 interface DashboardResponse {
     balance: string;
     totalInvested: string;
+    deposit: string;
     status: string;
     referralNo: number;
     referralAmount: number;

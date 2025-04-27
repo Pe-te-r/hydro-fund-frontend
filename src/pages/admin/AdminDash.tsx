@@ -31,7 +31,6 @@ const AdminDashboard = () => {
         refetchOnMountOrArgChange: true,
         pollingInterval:10000
     });
-    console.log(data)
     const [activeTab, setActiveTab] = useState<'withdrawals' | 'investments'>('investments');
 
 
@@ -143,7 +142,7 @@ const AdminDashboard = () => {
                             value={formatKES(completedFees)}
                             secondaryValue={`From ${completedWithdrawals.count} completed withdrawals`}
                             icon={<FiCreditCard className="text-amber-600 text-xl" />}
-                            trend="8% fee rate"
+                            trend="10% fee rate"
                             trendPositive={parseFloat(completedFees) > 0}
                         />
                     </div>

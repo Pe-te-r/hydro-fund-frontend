@@ -373,7 +373,6 @@ export default function DepositPage() {
                                             </>
                                         )}
 
-                                        {/* ... other form parts ... */}
 
                                         <div className="flex space-x-3 pt-2">
                                             <button

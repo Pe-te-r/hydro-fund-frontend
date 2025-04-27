@@ -162,6 +162,19 @@ const AdminUserData = () => {
                     </div>
                 </div>
 
+                {/* Total deoisited Card */}
+                <div className="bg-white rounded-lg shadow-md p-6">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h3 className="text-gray-500 font-medium">Total deposit</h3>
+                            <p className="text-2xl font-bold">{formatCurrency(userData.data.userInfo.deposit)}</p>
+                        </div>
+                        <div className="bg-green-100 p-3 rounded-full">
+                            <FiDollarSign className="text-green-600 text-xl" />
+                        </div>
+                    </div>
+                </div>
+
                 {/* Total Invested Card */}
                 <div className="bg-white rounded-lg shadow-md p-6">
                     <div className="flex items-center justify-between">
@@ -174,6 +187,7 @@ const AdminUserData = () => {
                         </div>
                     </div>
                 </div>
+                
 
                 {/* Total Withdrawn Card */}
                 <div className="bg-white rounded-lg shadow-md p-6">

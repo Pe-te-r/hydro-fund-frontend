@@ -215,6 +215,14 @@ export default function AccountPage() {
                                     </p>
                                 </div>
                             </div>
+                            <div className="grid ">
+                                <div>
+                                    <p className="text-gray-500 text-sm">Total deposited</p>
+                                    <p className="text-xl font-medium text-gray-800">
+                                        Ksh {parseFloat(user.deposit).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                    </p>
+                                </div>
+                            </div>
 
                             {/* Action Buttons */}
                             <div className="grid grid-cols-2 gap-4 pt-4">
