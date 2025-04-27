@@ -52,15 +52,14 @@ const SettingsPage = () => {
                 password: { new: data.new, old: data.old },
                 id: user?.id || ''
             }).unwrap();
+              
             toast.success(info.message);
             await refetch();
         } catch (err) {
             const error = err as {status:number,data:ErrorResponse}
             if (error.data?.message) {
                 toast.error(error.data.message);
-            } else {
-                toast.error('Failed to update password');
-            }
+            } 
         }
     };
 

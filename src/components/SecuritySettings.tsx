@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { FiEdit, FiX, FiCheck, FiEye, FiEyeOff, FiCopy } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import QRCode from 'react-qr-code';
 import { UserSettings } from '../slice/settings';
 import { CodeVerification } from '../context/CodeVerification';
+import { ErrorResponse } from '../types/type';
 
 interface SecuritySettingsProps {
     userData: UserSettings;
@@ -26,12 +27,18 @@ const SecuritySettings = ({ userData, onPasswordUpdate, on2FAUpdate }: SecurityS
     });
     const [showPasswordCodeVerification, setShowPasswordCodeVerification] = useState(false);
     const [passwordCodeVerified, setPasswordCodeVerified] = useState(false);
+    const [passwordError, setPasswordError] = useState('');
 
     // 2FA state
     const [show2FASetup, setShow2FASetup] = useState(false);
-    const [twoFACode, setTwoFACode] = useState('');
+    const [twoFACode, setTwoFACode] = useState(['', '', '', '', '', '']);
+    const [twoFAError, setTwoFAError] = useState('');
+    const twoFARefs = useRef<(HTMLInputElement | null)[]>([]);
+
     const [showDisable2FA, setShowDisable2FA] = useState(false);
-    const [disable2FACode, setDisable2FACode] = useState('');
+    const [disable2FACode, setDisable2FACode] = useState(['', '', '', '', '', '']);
+    const [disable2FAError, setDisable2FAError] = useState('');
+    const disable2FARefs = useRef<(HTMLInputElement | null)[]>([]);
 
     const canEditPassword = (): boolean => {
         if (!userData.password?.lastChanged) return true;
@@ -41,23 +48,73 @@ const SecuritySettings = ({ userData, onPasswordUpdate, on2FAUpdate }: SecurityS
         return lastChanged < sevenDaysAgo;
     };
 
+    // Handle OTP input changes
+    const handleTwoFACodeChange = (index: number, value: string) => {
+        if (/^[0-9]$/.test(value) || value === '') {
+            const newCode = [...twoFACode];
+            newCode[index] = value;
+            setTwoFACode(newCode);
+
+            // Auto-focus next input
+            if (value !== '' && index < 5 && twoFARefs.current[index + 1]) {
+                twoFARefs.current[index + 1]?.focus();
+            }
+        }
+    };
+
+    const handleDisable2FACodeChange = (index: number, value: string) => {
+        if (/^[0-9]$/.test(value) || value === '') {
+            const newCode = [...disable2FACode];
+            newCode[index] = value;
+            setDisable2FACode(newCode);
+
+            // Auto-focus next input
+            if (value !== '' && index < 5 && disable2FARefs.current[index + 1]) {
+                disable2FARefs.current[index + 1]?.focus();
+            }
+        }
+    };
+
+    // Handle paste for OTP inputs
+    const handlePaste = (e: React.ClipboardEvent, setCode: (code: string[]) => void, refs: React.RefObject<(HTMLInputElement | null)[]>) => {
+        e.preventDefault();
+        const pasteData = e.clipboardData.getData('text/plain').slice(0, 6);
+        if (/^\d+$/.test(pasteData)) {
+            const pasteArray = pasteData.split('');
+            const newCode = [...Array(6)].map((_, i) => pasteArray[i] || '');
+            setCode(newCode);
+
+            // Focus the last input with a value
+            const lastFilledIndex = Math.min(pasteData.length - 1, 5);
+            if (refs.current[lastFilledIndex]) {
+                refs.current[lastFilledIndex]?.focus();
+            }
+        }
+    };
+
     // Password handlers
-    const handlePasswordEdit = () => setIsEditingPassword(true);
+    const handlePasswordEdit = () => {
+        setIsEditingPassword(true);
+        setPasswordError('');
+    };
+
     const handlePasswordCancel = () => {
         setIsEditingPassword(false);
         setPasswordCodeVerified(false);
         setPasswordData({ old: '', new: '', confirm: '' });
+        setPasswordError('');
     };
 
     const handlePasswordVerify = () => {
         if (passwordData.new !== passwordData.confirm) {
-            toast.error('New passwords do not match');
+            setPasswordError('New passwords do not match');
             return;
         }
         if (passwordData.new.length < 8) {
-            toast.error('Password must be at least 8 characters');
+            setPasswordError('Password must be at least 8 characters');
             return;
         }
+        setPasswordError('');
         setShowPasswordCodeVerification(true);
     };
 
@@ -65,11 +122,17 @@ const SecuritySettings = ({ userData, onPasswordUpdate, on2FAUpdate }: SecurityS
         try {
             await onPasswordUpdate({ old: passwordData.old, new: passwordData.new });
             setIsEditingPassword(false);
-            setPasswordCodeVerified(false);
+            // setPasswordCodeVerified(false);
             setPasswordData({ old: '', new: '', confirm: '' });
-        } catch (error) {
-            console.log(error)
-            toast.error('Failed to update password');
+        } catch (err) {
+            const error = err as {status:number,data:ErrorResponse}
+            console.log(error);
+            setPasswordError(error.data?.message || 'Failed to update password');
+            if (error.data?.message?.toLowerCase().includes('old password')) {
+                toast.error('Old password is incorrect');
+            } else {
+                toast.error(error.data?.message || 'Failed to update password');
+            }
         }
     };
 
@@ -83,30 +146,48 @@ const SecuritySettings = ({ userData, onPasswordUpdate, on2FAUpdate }: SecurityS
     const handle2FAToggle = () => {
         if (userData.twoFactorEnabled) {
             setShowDisable2FA(true);
+            setDisable2FAError('');
         } else {
             setShow2FASetup(true);
+            setTwoFAError('');
+            setTwoFACode(['', '', '', '', '', '']);
         }
     };
 
     const handleEnable2FA = async () => {
+        const code = twoFACode.join('');
+        if (code.length !== 6) {
+            setTwoFAError('Please enter a 6-digit code');
+            return;
+        }
+
         try {
-            await on2FAUpdate({ code: twoFACode, enabled: true });
+            await on2FAUpdate({ code, enabled: true });
             setShow2FASetup(false);
-            setTwoFACode('');
-        } catch (error) {
-            console.log(error)
-            toast.error('Failed to enable 2FA');
+            setTwoFACode(['', '', '', '', '', '']);
+            setTwoFAError('');
+        } catch (err) {
+            const error = err as { status: number, data: ErrorResponse }
+            setTwoFAError(error.data?.message || 'Invalid verification code');
         }
     };
 
     const handleDisable2FA = async () => {
+        const code = disable2FACode.join('');
+        if (code.length !== 6) {
+            setDisable2FAError('Please enter a 6-digit code');
+            return;
+        }
+
         try {
-            await on2FAUpdate({ code: disable2FACode, enabled: false });
+             await on2FAUpdate({ code, enabled: false });
             setShowDisable2FA(false);
-            setDisable2FACode('');
-        } catch (error) {
-            console.log(error)
-            toast.error('Failed to disable 2FA');
+            setDisable2FACode(['', '', '', '', '', '']);
+            setDisable2FAError('');
+        } catch (err) {
+            const error = err as { status: number, data: ErrorResponse }
+            console.log(error);
+            setDisable2FAError(error.data?.message || 'Invalid verification code');
         }
     };
 
@@ -200,6 +281,10 @@ const SecuritySettings = ({ userData, onPasswordUpdate, on2FAUpdate }: SecurityS
                                 <p className="mt-1 text-xs text-red-500">Passwords don't match</p>
                             )}
                         </div>
+
+                        {passwordError && (
+                            <p className="text-sm text-red-500">{passwordError}</p>
+                        )}
 
                         <div className="pt-2">
                             {passwordCodeVerified ? (
@@ -306,14 +391,25 @@ const SecuritySettings = ({ userData, onPasswordUpdate, on2FAUpdate }: SecurityS
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
                                         Enter 6-digit verification code
                                     </label>
-                                    <input
-                                        type="text"
-                                        value={twoFACode}
-                                        onChange={(e) => setTwoFACode(e.target.value)}
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
-                                        placeholder="123456"
-                                        maxLength={6}
-                                    />
+                                    <div className="flex space-x-2">
+                                        {[0, 1, 2, 3, 4, 5].map((index) => (
+                                            <input
+                                                key={index}
+                                                ref={(el) => { twoFARefs.current[index] = el }}
+                                                type="text"
+                                                maxLength={1}
+                                                value={twoFACode[index]}
+                                                onChange={(e) => handleTwoFACodeChange(index, e.target.value)}
+                                                onPaste={(e) => handlePaste(e, setTwoFACode, twoFARefs)}
+                                                className="w-10 h-10 text-center border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500"
+                                                pattern="[0-9]"
+                                                inputMode="numeric"
+                                            />
+                                        ))}
+                                    </div>
+                                    {twoFAError && (
+                                        <p className="mt-1 text-sm text-red-500">{twoFAError}</p>
+                                    )}
                                 </div>
 
                                 <button
@@ -339,14 +435,25 @@ const SecuritySettings = ({ userData, onPasswordUpdate, on2FAUpdate }: SecurityS
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                 Enter 6-digit verification code
                             </label>
-                            <input
-                                type="text"
-                                value={disable2FACode}
-                                onChange={(e) => setDisable2FACode(e.target.value)}
-                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border"
-                                placeholder="123456"
-                                maxLength={6}
-                            />
+                            <div className="flex space-x-2">
+                                {[0, 1, 2, 3, 4, 5].map((index) => (
+                                    <input
+                                        key={index}
+                                        ref={(el) => { disable2FARefs.current[index] = el }}
+                                        type="text"
+                                        maxLength={1}
+                                        value={disable2FACode[index]}
+                                        onChange={(e) => handleDisable2FACodeChange(index, e.target.value)}
+                                        onPaste={(e) => handlePaste(e, setDisable2FACode, disable2FARefs)}
+                                        className="w-10 h-10 text-center border border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500"
+                                        pattern="[0-9]"
+                                        inputMode="numeric"
+                                    />
+                                ))}
+                            </div>
+                            {disable2FAError && (
+                                <p className="mt-1 text-sm text-red-500">{disable2FAError}</p>
+                            )}
                         </div>
 
                         <div className="flex gap-3">
