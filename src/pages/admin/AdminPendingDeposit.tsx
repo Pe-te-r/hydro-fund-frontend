@@ -24,6 +24,10 @@ const AdminPendingDeposits = () => {
                 : [...prev, id]
         );
     };
+    const handleRemoveDeposit = (id: string) => {
+        setSelectedDeposits(prev => prev.filter(depositId => depositId !== id));
+    };
+
 
     const handleApproveDeposits = async () => {
         if (selectedDeposits.length === 0) {
@@ -148,7 +152,7 @@ const AdminPendingDeposits = () => {
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <button
                                                 onClick={() => {
-                                                    handleSelectDeposit(deposit.id);
+                                                    handleRemoveDeposit(deposit.id);
                                                     updateDeposit({ id: deposit.id })
                                                         .unwrap()
                                                         .then(() => {

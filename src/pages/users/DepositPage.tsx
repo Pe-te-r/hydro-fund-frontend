@@ -15,10 +15,10 @@ export default function DepositPage() {
 
     // Deposit verification states
     const [showDepositVerification, setShowDepositVerification] = useState(false);
-    const [depositPhone, setDepositPhone] = useState('0768543269');
-    const [depositAmount, setDepositAmount] = useState('1000');
+    const [depositPhone, setDepositPhone] = useState('');
+    const [depositAmount, setDepositAmount] = useState('');
     const [verificationMethod, setVerificationMethod] = useState<'whatsapp' | 'notification' | null>(null);
-    const [transactionCode, setTransactionCode] = useState('vfdubvi');
+    const [transactionCode, setTransactionCode] = useState('');
 
     const WHATSAPP_LINK = 'https://wa.me/message/ICQPLKGQUJAGM1';
 
