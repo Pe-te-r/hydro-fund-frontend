@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { useCreateDepositMutation } from '../../slice/deposit';
 import { useAuth } from '../../context/AuthContext';
 import { ErrorResponse } from '../../types/type';
+import CopyToClipboard from 'react-copy-to-clipboard';
 
 export default function DepositPage() {
     const [paymentMethod, setPaymentMethod] = useState<'mpesa' | 'paypal' | 'stripe' | 'airtel'>('mpesa');
@@ -219,7 +220,7 @@ export default function DepositPage() {
                                     </div>
                                 </div>
                             )}
-
+                           
                             {/* Automatic Pay (Coming Soon) */}
                             {mpesaMethod === 'automatic' && (
                                 <div className="text-center py-8">
@@ -296,8 +297,8 @@ export default function DepositPage() {
                             <span className="block font-medium mt-1">Please provide accurate details for quick resolution.</span>
                         </p>
 
-                        {!showDepositVerification ? (
-                            <div className="space-y-3">
+                        {!showDepositVerification ? 
+                            (<div className="space-y-3">
                                 <button
                                     onClick={() => {
                                         setVerificationMethod('whatsapp');
@@ -317,8 +318,75 @@ export default function DepositPage() {
                                 >
                                     Send Notification to Admin
                                 </button>
-                            </div>
-                        ) : (
+                            </div>): 
+                            (verificationMethod === 'whatsapp' ?
+                                (<div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                    <p className="text-blue-800 font-medium mb-3">
+                                        Please send this exact message format to WhatsApp for faster processing:
+                                    </p>
+
+                                    <div className="mt-2 p-3 bg-white rounded border border-blue-200">
+                                        <div className="font-mono text-sm space-y-2">
+                                            <p className="font-semibold">Deposit Verification Request</p>
+                                            <p>📱 Phone: <span className="font-bold">{depositPhone || '[Your M-Pesa Number]'}</span></p>
+                                            <p>💰 Amount: <span className="font-bold">KES {depositAmount || '[Amount Deposited]'}</span></p>
+                                            <p>🔢 Transaction Code: <span className="font-bold">{transactionCode || '[M-Pesa Code]'}</span></p>
+                                            <p>📅 Date: <span className="font-bold">{new Date().toLocaleDateString()}</span></p>
+                                        </div>
+
+                                        <div className="mt-4 pt-3 border-t border-blue-100">
+                                            <p className="text-xs text-blue-600">
+                                                Tip: Copy this message and paste it in WhatsApp after clicking the button below.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <CopyToClipboard
+                                        text={`Deposit Verification Request\n📱 Phone: ${depositPhone || '[Your M-Pesa Number]'}\n💰 Amount: KES ${depositAmount || '[Amount Deposited]'}\n🔢 Transaction Code: ${transactionCode || '[M-Pesa Code]'}\n📅 Date: ${new Date().toLocaleDateString()}`}
+                                        onCopy={() => toast.success('Message copied to clipboard!')}
+                                    >
+                                        <button className="mt-3 w-full py-2 px-4 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 flex items-center justify-center">
+                                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                            </svg>
+                                            Copy Message Template
+                                        </button>
+                                    </CopyToClipboard>
+
+                                    <div className="flex space-x-3 pt-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setShowDepositVerification(false);
+                                                setVerificationMethod(null);
+                                            }}
+                                            className="flex-1 py-2 px-4 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400"
+                                            disabled={isLoading}
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            className="flex-1 py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center justify-center"
+                                            disabled={isLoading}
+                                        >
+                                            {isLoading ? (
+                                                <>
+                                                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                    </svg>
+                                                    Processing...
+                                                </>
+                                            ) : (
+                                                verificationMethod === 'whatsapp' && 'Open WhatsApp'
+                                            )}
+                                        </button>
+                                    </div>
+
+                                    
+                                </div>
+                             ):(
                                 <form onSubmit={handleDepositVerificationSubmit}>
                                     <div className="space-y-4">
                                         {verificationMethod === 'notification' && (
@@ -400,12 +468,12 @@ export default function DepositPage() {
                                                         Processing...
                                                     </>
                                                 ) : (
-                                                    verificationMethod === 'whatsapp' ? 'Open WhatsApp' : 'Submit Notification'
+                                                    verificationMethod === 'notification'&& 'Submit Notification'
                                                 )}
                                             </button>
                                         </div>
                                     </div>
-                                </form>
+                                </form>)
                         )}
                     </div>
                 )}
