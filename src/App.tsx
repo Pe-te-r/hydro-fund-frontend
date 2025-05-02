@@ -29,6 +29,7 @@ import PrivacyPolicyPage from './components/PrivacyPolicyPage';
 import ChangePasswordPage from './pages/ChangePassword';
 import AdminPendingDeposits from './pages/admin/AdminPendingDeposit';
 import InvestmentDetail from './components/InvestDetails';
+import ContactPage from './pages/ContactPage';
 
 // Define props for our route components
 interface RouteComponentProps {
@@ -38,7 +39,6 @@ interface RouteComponentProps {
 // Create components with proper typing
 // const Invest = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">Investment Portal{children}</div>;
 const Marketplace = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">E-commerce Marketplace{children}</div>;
-const Contact = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 bg-gray-50 p-4">Contact Us{children}</div>;
 const NotFound = ({ children }: RouteComponentProps) => <div className="min-h-screen pt-16 p-4">404 - Page Not Found{children}</div>;
 
 function App() {
@@ -54,7 +54,7 @@ function App() {
           {/* Public routes */}
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
-          <Route path="/contact" element={<Contact />} />
+          <Route path="/contact" element={<ContactPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/forget" element={<ChangePasswordPage />} />
           <Route path="/register" element={<Register />} />

@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { FiClock, FiCheckCircle, FiDollarSign, FiCalendar, FiPlusCircle } from 'react-icons/fi';
+import { useState, useMemo, useEffect } from 'react';
+import { FiClock, FiCheckCircle, FiDollarSign, FiCalendar, FiPlusCircle, FiBell } from 'react-icons/fi';
 import { format } from 'date-fns';
 import { Order, useGetClaimMutation, useGetUserOrdersQuery } from '../slice/invest';
 import { useAuth } from '../context/AuthContext';
@@ -48,6 +48,29 @@ const InvestmentPage = () => {
         }, 0);
     };
 
+    const unclaimedCompletedCount = useMemo(() => {
+        if (!ordersResponse?.data) return 0;
+        return ordersResponse.data.filter(
+            order => order.status === 'completed' && !order.claimed
+        ).length;
+    }, [ordersResponse]);
+
+
+    // State for showing notification
+    const [showUnclaimedNotification, setShowUnclaimedNotification] = useState(false);
+
+    // Show notification when there are unclaimed orders and user switches to active tab
+    useEffect(() => {
+        if (activeTab === 'active' && unclaimedCompletedCount > 0) {
+            setShowUnclaimedNotification(true);
+            // Auto-hide after 5 seconds
+            const timer = setTimeout(() => {
+                setShowUnclaimedNotification(false);
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [activeTab, unclaimedCompletedCount]);
+
     const calculateOrderPotential = (order: Order) => {
         return order.items.reduce((acc, item) => acc + (Number(item.totalIncome) * item.quantity), 0);
     };
@@ -78,12 +101,44 @@ const InvestmentPage = () => {
         <div className="container mx-auto px-4 py-8 max-w-6xl">
             <h1 className="text-2xl font-bold mb-6">My Investments</h1>
 
-            <div className="flex border-b mb-6">
+            {/* Notification for unclaimed earnings */}
+            {showUnclaimedNotification && (
+                <div className="mb-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+                    <div className="flex items-start">
+                        <FiBell className="text-yellow-600 mt-1 mr-3 flex-shrink-0" />
+                        <div>
+                            <p className="font-medium text-yellow-800">
+                                You have {unclaimedCompletedCount} completed investment{unclaimedCompletedCount > 1 ? 's' : ''} with unclaimed earnings!
+                            </p>
+                            <p className="text-sm text-yellow-700 mt-1">
+                                Switch to the "Completed Investments" tab to claim your earnings.
+                            </p>
+                            <button
+                                onClick={() => {
+                                    setActiveTab('completed');
+                                    setShowUnclaimedNotification(false);
+                                }}
+                                className="mt-2 text-sm text-yellow-800 hover:text-yellow-900 font-medium underline"
+                            >
+                                Go to Completed Investments
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+
+            <div className="flex border-b mb-6 relative">
                 <button
                     className={`px-4 py-2 font-medium ${activeTab === 'active' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
                     onClick={() => setActiveTab('active')}
                 >
                     Active Investments
+                    {unclaimedCompletedCount > 0 && (
+                        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                            {unclaimedCompletedCount}
+                        </span>
+                    )}
                 </button>
                 <button
                     className={`px-4 py-2 font-medium ${activeTab === 'completed' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}
@@ -172,7 +227,6 @@ const InvestmentPage = () => {
                                                 daysPassed * Number(item.dailyIncome),
                                                 Number(item.totalIncome) * item.quantity
                                             );
-                                            console.log(itemCurrentEarnings)
                                             const endDate = new Date(item.createdAt || '');
                                             endDate.setDate(endDate.getDate() + item.cycle);
                                             const isItemCompleted = daysPassed >= item.cycle;
