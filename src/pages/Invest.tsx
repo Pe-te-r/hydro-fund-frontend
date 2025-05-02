@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { FiDollarSign, FiClock, FiTrendingUp, FiInfo, FiShoppingCart } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
 import { mockProducts } from './data';
+import { useNavigate } from 'react-router-dom';
 
 export interface InvestmentProduct {
     id: string;
@@ -17,6 +18,7 @@ export interface InvestmentProduct {
 export default function InvestmentProducts() {
     const [products, setProducts] = useState<InvestmentProduct[]>([]);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
     const [error, setError] = useState<string | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<string>('starter');
     const { cartItems, addToCart, removeFromCart } = useCart();
@@ -205,7 +207,10 @@ export default function InvestmentProducts() {
                                     )}
 
                                     {/* Info Link */}
-                                    <button className="mt-3 cursor-pointer w-full flex items-center justify-center text-sm text-blue-600 hover:text-blue-800">
+                                    <button
+                                        onClick={() => navigate(`/investments/${product.id}`)}
+                                        className="mt-3 cursor-pointer w-full flex items-center justify-center text-sm text-blue-600 hover:text-blue-800"
+                                    >
                                         <FiInfo className="mr-1" /> More details
                                     </button>
                                 </div>

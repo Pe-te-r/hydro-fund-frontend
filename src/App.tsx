@@ -28,6 +28,7 @@ import DisclaimerPage from './components/DisclaimerPage';
 import PrivacyPolicyPage from './components/PrivacyPolicyPage';
 import ChangePasswordPage from './pages/ChangePassword';
 import AdminPendingDeposits from './pages/admin/AdminPendingDeposit';
+import InvestmentDetail from './components/InvestDetails';
 
 // Define props for our route components
 interface RouteComponentProps {
@@ -89,6 +90,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/investments/:id" element={<ProtectedRoute><InvestmentDetail /></ProtectedRoute>} />
+
           <Route
             path="/marketplace"
             element={
@@ -151,6 +154,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
 
 
           {/* admin routes */}
